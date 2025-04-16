@@ -45,13 +45,13 @@ skord_data = pd.DataFrame({
 })
 
 editable_skord_data = st.data_editor(skord_data, use_container_width=True)
-editable_skord_data["Intäkt per m² (kr)"] = editable_skord_data["Skörd (kg/m²)"] * editable_skord_data["Pris (kr/kg)"] * (1 + skordeokning / 100) * (andel_sonicflora / 100)
+editable_skord_data["Intäkt för Sonicflora per m² (kr)"] = editable_skord_data["Skörd (kg/m²)"] * editable_skord_data["Pris (kr/kg)"] * (1 + skordeokning / 100) * (andel_sonicflora / 100)
 
 # 1) Räkna ut grundintäkt per m²
 grundintakt = skord_data["Skörd (kg/m²)"] * skord_data["Pris (kr/kg)"]
 
 # 2) Ta bara ökningen och SonicFloras andel
-skord_data["Intäkt per m² (kr)"] = (
+skord_data["Intäkt för Sonicflora per m² (kr)"] = (
     grundintakt
     * (skordeokning    / 100)   # bara procentuell ökning
     * (andel_sonicflora / 100)   # SonicFloras andel av ökningen
@@ -67,12 +67,12 @@ editable_skord_data = st.data_editor(
         "Skörd (kg/m²)": st.column_config.NumberColumn(disabled=False),
         "Pris (kr/kg)": st.column_config.NumberColumn(disabled=False),
         "Grundintäkt (kr/m²)": st.column_config.NumberColumn(disabled=True),
-        "Intäkt per m² (kr)": st.column_config.NumberColumn(disabled=True)
+        "Intäkt för Sonicflora per m² (kr)": st.column_config.NumberColumn(disabled=True)
     },
-    disabled=["Land", "Grundintäkt (kr/m²)", "Intäkt per m² (kr)"]
+    disabled=["Land", "Grundintäkt (kr/m²)", "Intäkt för Sonicflora per m² (kr)"]
 )
 editable_skord_data["Grundintäkt (kr/m²)"] = editable_skord_data["Skörd (kg/m²)"] * editable_skord_data["Pris (kr/kg)"]
-editable_skord_data["Intäkt per m² (kr)"] = editable_skord_data["Grundintäkt (kr/m²)"] * (1 + skordeokning / 100) * (andel_sonicflora / 100)
+editable_skord_data["Intäkt för Sonicflora per m² (kr)"] = editable_skord_data["Grundintäkt (kr/m²)"] * (1 + skordeokning / 100) * (andel_sonicflora / 100)
 
 
 # Standarddata för redigering
@@ -87,7 +87,7 @@ def get_default_data():
         ],
         "Startyta (m²)": [45000] * 13,
         "Tillväxttakt (%/år)": [10] * 13,
-        "Intäkt per m² (kr)": editable_skord_data["Intäkt per m² (kr)"].round(2).tolist()
+        "Intäkt för Sonicflora per m² (kr)": editable_skord_data["Intäkt för Sonicflora per m² (kr)"].round(2).tolist()
     })
 
 st.subheader("🌍 Marknadsdata")
@@ -104,7 +104,7 @@ for _, row in input_df.iterrows():
     year_intro = int(row["Startår"])
     area = float(row["Startyta (m²)"])
     growth_rate = float(row["Tillväxttakt (%/år)"]) / 100
-    revenue_per_m2 = float(row["Intäkt per m² (kr)"])
+    revenue_per_m2 = float(row["Intäkt för Sonicflora per m² (kr)"])
 
     current_area = area
     for year in years:
@@ -121,7 +121,7 @@ for _, row in input_df.iterrows():
                 "År": int(year),
                 "Land": land,
                 "Odlingsyta (m²)": round(current_area),
-                "Intäkt per m² (kr)": revenue_per_m2,
+                "Intäkt för Sonicflora per m² (kr)": revenue_per_m2,
                 "Mjukvaruintäkt (kr)": round(total_revenue),
                 "Hårdvaruintäkt (kr)": round(hardware_revenue),
                 "Total intäkt (kr)": round(total_revenue + hardware_revenue)
