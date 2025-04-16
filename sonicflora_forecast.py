@@ -78,9 +78,8 @@ for _, row in input_df.iterrows():
                 "Odlingsyta (m²)": round(current_area),
                 "Intäkt per m² (kr)": revenue_per_m2,
                 "Total årsintäkt (kr)": round(total_revenue),
-                "Total årsintäkt (mSEK)": round(total_revenue / 1_000_000, 2),
-                "Hårdvaruintäkt (mSEK)": round(hardware_revenue / 1_000_000, 2),
-                "Total intäkt inkl hårdvara (mSEK)": round((total_revenue + hardware_revenue) / 1_000_000, 2)
+                "Hårdvaruintäkt (kr)": round(hardware_revenue),
+                "Total intäkt inkl hårdvara (kr)": round(total_revenue + hardware_revenue)
             })
             current_area *= (1 + growth_rate)
 
@@ -90,9 +89,9 @@ if not results_df.empty:
     st.subheader(":bar_chart: Resultat")
     st.dataframe(results_df, use_container_width=True)
 
-    total_by_year = results_df.groupby(["År", "År_str"])[["Total årsintäkt (mSEK)", "Hårdvaruintäkt (mSEK)", "Total intäkt inkl hårdvara (mSEK)"]].sum().reset_index()
+    total_by_year = results_df.groupby(["År", "År_str"])[["Total årsintäkt (kr)", "Hårdvaruintäkt (kr)", "Total intäkt inkl hårdvara (kr)"]].sum().reset_index()
     total_by_year = total_by_year.sort_values("År")
     total_by_year = total_by_year.set_index("År_str")
 
-    st.markdown("**Total årsintäkt (mSEK)**")
-    st.line_chart(data=total_by_year[["Total årsintäkt (mSEK)", "Hårdvaruintäkt (mSEK)", "Total intäkt inkl hårdvara (mSEK)"]])
+    st.markdown("**Total årsintäkt (kr)**")
+    st.line_chart(data=total_by_year[["Total årsintäkt (kr)", "Hårdvaruintäkt (kr)", "Total intäkt inkl hårdvara (kr)"]])
