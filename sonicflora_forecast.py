@@ -148,6 +148,7 @@ if not results_df.empty:
       padding-left: 4px;
     }
     table.custom-table {
+  font-family: inherit;
       width: 100%;
       border-collapse: collapse;
     }
@@ -219,7 +220,7 @@ table.custom-table th {
 <script>
 function copyText(value) {
   navigator.clipboard.writeText(value);
-  alert('Kopierat: ' + value);
+  
 }
 </script>
 <table class='custom-table'>
