@@ -97,4 +97,9 @@ if not results_df.empty:
 
     # Ny sektion: sammanställning per år
     st.subheader("📘 Sammanställning per år")
-    st.dataframe(total_by_year, use_container_width=True)
+    renamed_total_by_year = total_by_year.rename(columns={
+    "Total årsintäkt (kr)": "Mjukvaruintäkt (kr)",
+    "Hårdvaruintäkt (kr)": "Hårdvaruintäkt (kr)",
+    "Total intäkt inkl hårdvara (kr)": "Total intäkt (kr)"
+})
+st.dataframe(renamed_total_by_year, use_container_width=True)
