@@ -148,7 +148,7 @@ if not results_df.empty:
       padding-left: 4px;
     }
     table.custom-table {
-  font-family: inherit;
+  font-family: "Inter", "Segoe UI", "Roboto", sans-serif;
       width: 100%;
       border-collapse: collapse;
     }
