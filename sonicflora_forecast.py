@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 
@@ -15,17 +14,29 @@ Fyll i parametrar för varje marknad nedan. Verktyget räknar ut:
 # Sidopanel: Inställningar
 st.sidebar.header("Prognosinställningar")
 start_year = st.sidebar.number_input("Startår för prognos", value=2027)
-end_year = st.sidebar.number_input("Slutår för prognos", value=2035)
+end_year = st.sidebar.number_input("Slutår för prognos", value=2034)
 years = list(range(start_year, end_year + 1))
 
 # Exempeltabell med redigerbara värden
 def get_default_data():
     return pd.DataFrame({
-        "Land": ["Sweden", "Norway", "Netherlands"],
-        "Startår": [2027, 2028, 2029],
-        "Startyta (m²)": [45000, 45000, 45000],
-        "Tillväxttakt (%/year)": [10, 10, 10],
-        "Intäkt per m² (kr)": [125.79, 183.28, 173.89]
+        "Land": [
+            "Sweden", "Norway", "Denmark", "Finland", "Iceland",
+            "Netherlands", "United Kingdom", "Germany", "Belgium",
+            "Austria", "Ireland", "Spain", "Italy"
+        ],
+        "Startår": [
+            2027, 2028, 2028, 2029, 2029,
+            2030, 2030, 2030, 2031,
+            2032, 2032, 2033, 2034
+        ],
+        "Startyta (m²)": [45000] * 13,
+        "Tillväxttakt (%/year)": [10] * 13,
+        "Intäkt per m² (kr)": [
+            125.79, 183.28, 259.66, 186.75, 369.19,
+            173.89, 141.23, 109.01, 160.28,
+            67.11, 202.42, 6.81, 2.45
+        ]
     })
 
 st.subheader("🌐 Marknadsdata")
