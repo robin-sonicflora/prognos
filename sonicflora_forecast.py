@@ -61,6 +61,7 @@ for _, row in input_df.iterrows():
             total_revenue = current_area * revenue_per_m2
             results.append({
                 "År": int(year),
+                "År_str": str(year),
                 "Land": land,
                 "Odlingsyta (m²)": round(current_area),
                 "Intäkt per m² (kr)": revenue_per_m2,
@@ -75,6 +76,6 @@ if not results_df.empty:
     st.subheader(":bar_chart: Resultat")
     st.dataframe(results_df, use_container_width=True)
 
-    total_by_year = results_df.groupby("År")["Total årsintäkt (mSEK)"].sum().reset_index()
-    total_by_year["År"] = total_by_year["År"].astype(int)
-    st.line_chart(data=total_by_year.set_index("År"))
+    total_by_year = results_df.groupby(["År", "År_str"])["Total årsintäkt (mSEK)"].sum().reset_index()
+    total_by_year = total_by_year.sort_values("År")
+    st.line_chart(data=total_by_year.set_index("År_str"))
