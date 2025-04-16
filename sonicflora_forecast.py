@@ -116,7 +116,10 @@ if not results_df.empty:
     st.markdown("**Mjukvaruintäkt, Hårdvaruintäkt och Total intäkt (kr)**")
     st.line_chart(data=total_by_year.set_index("År")[["Mjukvaruintäkt (kr)", "Hårdvaruintäkt (kr)", "Total intäkt (kr)"]])
 
-    # Lägg till ackumulerad yta per år
+    # Säkerställ att År är numeriskt för att kunna merge:a
+total_by_year["År"] = pd.to_numeric(total_by_year["År"], errors="coerce")
+
+# Lägg till ackumulerad yta per år
 etablerad_yta_per_ar = results_df.groupby("År")["Odlingsyta (m²)"].sum().reset_index()
 etablerad_yta_per_ar = etablerad_yta_per_ar.rename(columns={"Odlingsyta (m²)": "Etablerad yta (m²)"})
 total_by_year = pd.merge(total_by_year, etablerad_yta_per_ar, on="År", how="left")
