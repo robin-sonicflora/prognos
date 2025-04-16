@@ -88,7 +88,7 @@ if not results_df.empty:
     st.subheader(":bar_chart: Resultat")
     st.dataframe(results_df, use_container_width=True)
 
-    total_by_year = results_df.groupby("År")[["Total årsintäkt (kr)", "Hårdvaruintäkt (kr)", "Total intäkt inkl hårdvara (kr)"]].sum().reset_index()
+    total_by_year = results_df.groupby("År")[["Mjukvaruintäkt (kr)", "Hårdvaruintäkt (kr)", "Total intäkt inkl hårdvara (kr)"]].sum().reset_index()
     total_by_year = total_by_year.sort_values("År")
     total_by_year["År"] = total_by_year["År"].astype(str)
 
