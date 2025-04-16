@@ -121,6 +121,16 @@ etablerad_yta_per_ar = results_df.groupby("År")["Odlingsyta (m²)"].sum().reset
 etablerad_yta_per_ar = etablerad_yta_per_ar.rename(columns={"Odlingsyta (m²)": "Etablerad yta (m²)"})
 total_by_year = pd.merge(total_by_year, etablerad_yta_per_ar, on="År", how="left")
 
+# Lägg till ackumulerad yta per år
+etablerad_yta_per_ar = results_df.groupby("År")["Odlingsyta (m²)"].sum().reset_index()
+etablerad_yta_per_ar = etablerad_yta_per_ar.rename(columns={"Odlingsyta (m²)": "Etablerad yta (m²)"})
+total_by_year = pd.merge(total_by_year, etablerad_yta_per_ar, on="År", how="left")
+
+# Lägg till summeringsrad
+sum_row = total_by_year.drop(columns=["År"]).sum(numeric_only=True).to_frame().T
+sum_row.insert(0, "År", "Totalt")
+total_by_year = pd.concat([total_by_year, sum_row], ignore_index=True)
+
 # Sammanställning
     st.subheader("📘 Sammanställning per år")
     # Lägg till summeringsrad
