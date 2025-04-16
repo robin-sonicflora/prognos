@@ -140,6 +140,9 @@ if not results_df.empty:
     st.subheader("📘 Sammanställning per år")
     html_table = """
     <style>
+body, table, td, th, .copy-btn, * {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+}
 html, body, table.custom-table, .copy-btn {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
