@@ -120,7 +120,8 @@ st.dataframe(results_df_formatted, use_container_width=True)
 
 total_by_year = results_df.groupby("År")[["Mjukvaruintäkt (kr)", "Hårdvaruintäkt (kr)", "Total intäkt (kr)"]].sum().reset_index()
 
-total_by_year = total_by_year.sort_values("År")total_by_year["År"] = pd.to_numeric(total_by_year["År"], errors="coerce")
+total_by_year = total_by_year.sort_values("År")
+total_by_year["År"] = pd.to_numeric(total_by_year["År"], errors="coerce")
 
     # Lägg till ackumulerad yta per år
     etablerad_yta_per_ar = results_df.groupby("År")["Odlingsyta (m²)"].sum().reset_index()
