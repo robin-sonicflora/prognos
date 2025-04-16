@@ -123,4 +123,9 @@ total_by_year = pd.merge(total_by_year, etablerad_yta_per_ar, on="År", how="lef
 
 # Sammanställning
     st.subheader("📘 Sammanställning per år")
-    st.dataframe(total_by_year, use_container_width=True)
+    # Lägg till summeringsrad
+sum_row = total_by_year.drop(columns=["År"]).sum().to_frame().T
+sum_row.insert(0, "År", "Totalt")
+total_by_year_sum = pd.concat([total_by_year, sum_row], ignore_index=True)
+
+st.dataframe(total_by_year_sum, use_container_width=True)
