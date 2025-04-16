@@ -138,5 +138,5 @@ st.markdown("**Mjukvaruintäkt, Hårdvaruintäkt och Total intäkt (kr)**")
 st.line_chart(data=total_by_year.set_index("År")[["Mjukvaruintäkt (kr)", "Hårdvaruintäkt (kr)", "Total intäkt (kr)"]])
 
 # Visa tabell
-        st.subheader("📘 Sammanställning per år")
+    st.subheader("📘 Sammanställning per år")
     st.dataframe(total_by_year, use_container_width=True)
