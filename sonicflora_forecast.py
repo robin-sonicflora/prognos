@@ -95,3 +95,7 @@ if not results_df.empty:
 
     st.markdown("**Total årsintäkt (kr)**")
     st.line_chart(data=total_by_year[["Total årsintäkt (kr)", "Hårdvaruintäkt (kr)", "Total intäkt inkl hårdvara (kr)"]])
+
+    # Ny sektion: sammanställning per år
+    st.subheader("📘 Sammanställning per år")
+    st.dataframe(total_by_year.reset_index().rename(columns={"År_str": "År"}), use_container_width=True)
