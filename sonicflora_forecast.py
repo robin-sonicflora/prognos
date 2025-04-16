@@ -44,10 +44,37 @@ skord_data = pd.DataFrame({
     ]
 })
 
-editable_skord_data = st.data_editor(skord_data, use_container_width=True)
-editable_skord_data["Intäkt per m² (kr)"] = editable_skord_data["Skörd (kg/m²)"] * editable_skord_data["Pris (kr/kg)"] * (1 + skordeokning / 100) * (andel_sonicflora / 100)
+# Beräkna intäkt per m² som tidigare
+skord_data["Intäkt per m² (kr)"] = (
+    skord_data["Skörd (kg/m²)"]
+    * skord_data["Pris (kr/kg)"    ]
+    * (1 + skordeokning / 100)
+    * (andel_sonicflora / 100)
+)
 
-skord_data["Intäkt per m² (kr)"] = skord_data["Skörd (kg/m²)"] * skord_data["Pris (kr/kg)"] * (1 + skordeokning / 100) * (andel_sonicflora / 100)
+# Lägg till read‑only‑kolumnen
+skord_data["Beräknad intäkt per m²"] = (
+    skord_data["Skörd (kg/m²)"]
+    * skord_data["Pris (kr/kg)"    ]
+    * (1 + skordeokning / 100)
+    * (andel_sonicflora / 100)
+).round(2)
+
+# Gör kolumnen icke‑redigerbar
+t_column_config = {
+    "Beräknad intäkt per m²": st.column_config.NumberColumn(
+        "Beräknad intäkt per m²",
+        format="%.2f",
+        disabled=True
+    )
+}
+
+# Ersätter tidigare data_editor-anrop
+editable_skord_data = st.data_editor(
+    skord_data,
+    column_config=column_config,
+    use_container_width=True
+)
 
 st.subheader("📐 Uträkning av intäkt per m²")
 st.markdown("Formel: Skörd × Pris × (1 + ökning) × andel till SonicFlora")
