@@ -54,11 +54,7 @@ st.dataframe(skord_data, use_container_width=True)
 
 def get_default_data():
     return pd.DataFrame({
-        "Land": [
-            "Sverige", "Norge", "Danmark", "Finland", "Island",
-            "Nederländerna", "Storbritannien", "Tyskland", "Belgien",
-            "Österrike", "Irland", "Spanien", "Italien"
-        ],
+        "Land": skord_data["Land"].tolist(),
         "Startår": [
             2027, 2028, 2028, 2029, 2029,
             2030, 2030, 2030, 2031,
@@ -107,101 +103,87 @@ for _, row in input_df.iterrows():
             })
             current_area *= (1 + growth_rate)
 
-# Resultat
 results_df = pd.DataFrame(results)
 if not results_df.empty:
     st.subheader("📊 Resultat per marknad")
-    # Formatera intäkter med mellanrum
-results_df_formatted = results_df.copy()
-for col in ["Mjukvaruintäkt (kr)", "Hårdvaruintäkt (kr)", "Total intäkt (kr)"]:
-    results_df_formatted[col] = results_df_formatted[col].apply(lambda x: f"{x:,.0f}".replace(",", " ") + " kr")
 
-st.dataframe(results_df_formatted, use_container_width=True)
+    results_df_formatted = results_df.copy()
+    for col in ["Mjukvaruintäkt (kr)", "Hårdvaruintäkt (kr)", "Total intäkt (kr)"]:
+        results_df_formatted[col] = results_df_formatted[col].apply(lambda x: f"{x:,.0f}".replace(",", " ") + " kr")
 
-total_by_year = results_df.groupby("År")[["Mjukvaruintäkt (kr)", "Hårdvaruintäkt (kr)", "Total intäkt (kr)"]].sum().reset_index()
+    st.dataframe(results_df_formatted, use_container_width=True)
 
-total_by_year = total_by_year.sort_values("År")
-total_by_year["År"] = pd.to_numeric(total_by_year["År"], errors="coerce")
+    total_by_year = results_df.groupby("År")[["Mjukvaruintäkt (kr)", "Hårdvaruintäkt (kr)", "Total intäkt (kr)"]].sum().reset_index()
+    total_by_year = total_by_year.sort_values("År")
+    total_by_year["År"] = pd.to_numeric(total_by_year["År"], errors="coerce")
 
-    # Lägg till ackumulerad yta per år
     etablerad_yta_per_ar = results_df.groupby("År")["Odlingsyta (m²)"].sum().reset_index()
     etablerad_yta_per_ar = etablerad_yta_per_ar.rename(columns={"Odlingsyta (m²)": "Etablerad yta (m²)"})
     total_by_year = pd.merge(total_by_year, etablerad_yta_per_ar, on="År", how="left")
 
-    # Lägg till summeringsrad
     sum_row = total_by_year.drop(columns=["År"]).sum(numeric_only=True).to_frame().T
     sum_row.insert(0, "År", "Totalt")
     total_by_year = pd.concat([total_by_year, sum_row], ignore_index=True)
 
-    # Flytta "Etablerad yta (m²)" efter "År"
     cols = total_by_year.columns.tolist()
     if "Etablerad yta (m²)" in cols:
         cols.insert(1, cols.pop(cols.index("Etablerad yta (m²)")))
     total_by_year = total_by_year[cols]
 
-    # Visa diagram över intäkter per år
-# Filtrera bort totalsummeringen och konvertera år till sträng för korrekt axel
-total_by_year_plot = total_by_year[total_by_year["År"] != "Totalt"].copy()
-total_by_year_plot["År"] = total_by_year_plot["År"].astype(str)
-st.markdown("**Mjukvaruintäkt, Hårdvaruintäkt och Total intäkt (kr)**")
-total_by_year_plot["År"] = total_by_year_plot["År"].astype(str)
-st.line_chart(data=total_by_year_plot.set_index("År")[["Mjukvaruintäkt (kr)", "Hårdvaruintäkt (kr)", "Total intäkt (kr)"]])
+    # Visa diagram
+    total_by_year_plot = total_by_year[total_by_year["År"] != "Totalt"].copy()
+    total_by_year_plot["År"] = total_by_year_plot["År"].astype(str)
+    st.markdown("**Mjukvaruintäkt, Hårdvaruintäkt och Total intäkt (kr)**")
+    st.line_chart(data=total_by_year_plot.set_index("År")[["Mjukvaruintäkt (kr)", "Hårdvaruintäkt (kr)", "Total intäkt (kr)"]])
 
-# Visa tabell
-st.subheader("📘 Sammanställning per år")
-# Formatera intäkter med mellanrum
-formatted_total_by_year = total_by_year.copy()
-for col in ["Mjukvaruintäkt (kr)", "Hårdvaruintäkt (kr)", "Total intäkt (kr)", "Etablerad yta (m²)"]:
-    formatted_total_by_year[col] = formatted_total_by_year[col].apply(lambda x: f"{x:,.0f}".replace(",", " ") + (" kr" if "intäkt" in col else " m²"))
-
-# HTML-tabell med kopieringsknapp för intäktssiffror
-html_table = """
-<style>
-button.copy-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 14px;
-  padding-left: 4px;
-}
-table.custom-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-table.custom-table th, table.custom-table td {
-  border: 1px solid #ddd;
-  padding: 6px;
-  text-align: left;
-  font-size: 14px;
-}
-table.custom-table th {
-  background-color: #f5f5f5;
-}
-</style>
-<script>
-function copyToClipboard(value) {
-  navigator.clipboard.writeText(value);
-}
-</script>
-<table class='custom-table'>
-<thead><tr>"""
-for col in total_by_year.columns:
-    html_table += f"<th>{col}</th>"
-html_table += "</tr></thead><tbody>"
-
-for _, row in total_by_year.iterrows():
-    html_table += "<tr>"
+    # Anpassad HTML-tabell med kopieringsknappar
+    st.subheader("📘 Sammanställning per år")
+    html_table = """
+    <style>
+    button.copy-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      padding-left: 4px;
+    }
+    table.custom-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    table.custom-table th, table.custom-table td {
+      border: 1px solid #ddd;
+      padding: 6px;
+      text-align: left;
+      font-size: 14px;
+    }
+    table.custom-table th {
+      background-color: #f5f5f5;
+    }
+    </style>
+    <script>
+    function copyToClipboard(value) {
+      navigator.clipboard.writeText(value);
+    }
+    </script>
+    <table class='custom-table'>
+    <thead><tr>"""
     for col in total_by_year.columns:
-        val = row[col]
-        if isinstance(val, (int, float)) and "intäkt" in col:
-            display_val = f"{val:,.0f}".replace(",", " ") + " kr"
-            html_table += f"<td>{display_val} <button class='copy-btn' onclick=\"copyToClipboard('{int(val)}')\">📋</button></td>"
-        elif isinstance(val, (int, float)) and "yta" in col:
-            display_val = f"{val:,.0f}".replace(",", " ") + " m²"
-            html_table += f"<td>{display_val}</td>"
-        else:
-            html_table += f"<td>{val}</td>"
-    html_table += "</tr>"
-html_table += "</tbody></table>"
+        html_table += f"<th>{col}</th>"
+    html_table += "</tr></thead><tbody>"
 
-st.markdown(html_table, unsafe_allow_html=True)
+    for _, row in total_by_year.iterrows():
+        html_table += "<tr>"
+        for col in total_by_year.columns:
+            val = row[col]
+            if isinstance(val, (int, float)) and "intäkt" in col:
+                display_val = f"{val:,.0f}".replace(",", " ") + " kr"
+                html_table += f"<td>{display_val} <button class='copy-btn' onclick=\"copyToClipboard('{int(val)}')\">📋</button></td>"
+            elif isinstance(val, (int, float)) and "yta" in col:
+                display_val = f"{val:,.0f}".replace(",", " ") + " m²"
+                html_table += f"<td>{display_val}</td>"
+            else:
+                html_table += f"<td>{val}</td>"
+        html_table += "</tr>"
+    html_table += "</tbody></table>"
+    st.markdown(html_table, unsafe_allow_html=True)
