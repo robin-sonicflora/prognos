@@ -134,6 +134,9 @@ if not results_df.empty:
     total_by_year = total_by_year[cols]
 
     # Visa diagram över intäkter per år
+# Filtrera bort totalsummeringen och konvertera år till sträng för korrekt axel
+total_by_year_plot = total_by_year[total_by_year["År"] != "Totalt"].copy()
+total_by_year_plot["År"] = total_by_year_plot["År"].astype(str)
 st.markdown("**Mjukvaruintäkt, Hårdvaruintäkt och Total intäkt (kr)**")
 total_by_year_plot["År"] = total_by_year_plot["År"].astype(str)
 st.line_chart(data=total_by_year_plot.set_index("År")[["Mjukvaruintäkt (kr)", "Hårdvaruintäkt (kr)", "Total intäkt (kr)"]])
