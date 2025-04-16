@@ -271,7 +271,8 @@ components.html(copy_table_html, height=600, scrolling=True)
 
 # === Ny sektion: Manuellt testscenario ===
 st.subheader("🧪 Testa ett scenario manuellt")
-with st.container():
+col1, _ = st.columns([1, 2])  # 1/3 bredd
+with col1:
     test_area = st.number_input("Odlingsyta (m²)", value=45000)
     test_skord = st.number_input("Skörd (kg/m²)", value=42.2)
     test_pris = st.number_input("Pris (kr/kg)", value=12.42)
