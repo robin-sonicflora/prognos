@@ -98,4 +98,6 @@ if not results_df.empty:
 
     # Ny sektion: sammanställning per år
     st.subheader("📘 Sammanställning per år")
-    st.dataframe(total_by_year.reset_index().rename(columns={"År_str": "År"}), use_container_width=True)
+    summary_df = total_by_year.reset_index().rename(columns={"År_str": "År"})
+    summary_df["År"] = summary_df["År"].astype(str)
+    st.dataframe(summary_df, use_container_width=True)
