@@ -88,11 +88,11 @@ if not results_df.empty:
     st.subheader(":bar_chart: Resultat")
     st.dataframe(results_df, use_container_width=True)
 
-    total_by_year = results_df.groupby("År")[["Mjukvaruintäkt (kr)", "Hårdvaruintäkt (kr)", "Total intäkt inkl hårdvara (kr)"]].sum().reset_index()
+    total_by_year = results_df.groupby("År")[["Total årsintäkt (kr)", "Hårdvaruintäkt (kr)", "Total intäkt inkl hårdvara (kr)"]].sum().reset_index()
     total_by_year = total_by_year.sort_values("År")
     total_by_year["År"] = total_by_year["År"].astype(str)
 
-    st.markdown("**Total årsintäkt (kr)**")
+    st.markdown("**Mjukvaruintäkt, Hårdvaruintäkt och Total intäkt (kr)**")
     st.line_chart(data=total_by_year.set_index("År")[["Total årsintäkt (kr)", "Hårdvaruintäkt (kr)", "Total intäkt inkl hårdvara (kr)"]])
 
     # Ny sektion: sammanställning per år
