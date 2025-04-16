@@ -148,7 +148,7 @@ if not results_df.empty:
       padding-left: 4px;
     }
     table.custom-table {
-  font-family: "Inter", "Segoe UI", "Roboto", sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       width: 100%;
       border-collapse: collapse;
     }
