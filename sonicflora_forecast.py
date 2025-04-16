@@ -56,7 +56,7 @@ editable_skord_data["Intäkt för Sonicflora per m² (kr)"] = (
     editable_skord_data["Grundintäkt (kr/m²)"]
     * (skordeokning    / 100)   # bara ökningen
     * (andel_sonicflora / 100)   # andel av den
-
+)
 # 3) Beräkna grundintäkt som egen kolumn (så den finns i editable_skord_data)
 skord_data["Grundintäkt (kr/m²)"] = (
     skord_data["Skörd (kg/m²)"]
