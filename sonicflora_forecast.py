@@ -100,4 +100,7 @@ if not results_df.empty:
     st.subheader("📘 Sammanställning per år")
     summary_df = total_by_year.reset_index().rename(columns={"År_str": "År"})
     summary_df["År"] = summary_df["År"].astype(str)
+    for col in summary_df.columns:
+        if col != "År":
+            summary_df[col] = pd.to_numeric(summary_df[col], errors="coerce")
     st.dataframe(summary_df, use_container_width=True)
