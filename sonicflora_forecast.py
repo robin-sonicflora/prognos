@@ -103,6 +103,25 @@ for _, row in input_df.iterrows():
             })
             current_area *= (1 + growth_rate)
 
+# Resultat per marknad
+st.subheader("📊 Resultat per marknad")
+
+# Summering per marknad (total intäkt)
+summary_per_market = results_df.groupby("Land")["Total intäkt (kr)"].sum().sort_values(ascending=False).reset_index()
+
+# Visa som cirkeldiagram
+st.subheader("🧭 Fördelning per marknad")
+st.plotly_chart({
+    "data": [{
+        "type": "pie",
+        "labels": summary_per_market["Land"],
+        "values": summary_per_market["Total intäkt (kr)"],
+        "hoverinfo": "label+percent",
+        "textinfo": "value"
+    }],
+    "layout": {"margin": {"l": 0, "r": 0, "b": 0, "t": 0}}
+})
+
 # Resultat
 results_df = pd.DataFrame(results)
 if not results_df.empty:
