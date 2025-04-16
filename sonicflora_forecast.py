@@ -281,9 +281,9 @@ with col1:
 
     # Beräkningar
     grundintakt = test_skord * test_pris
-    intakt_efter_okning = grundintakt * (1 + test_okning / 100)
-    sonicflora_intakt = intakt_efter_okning * (test_andel / 100)
-    total_intakt = sonicflora_intakt * test_area
+    ökning_per_m2 = grundintakt * (test_okning / 100)
+    sonicflora_per_m2 = ökning_per_m2 * (test_andel / 100)
+    total_intakt = sonicflora_per_m2 * test_area
 
     st.markdown(f"""
     **Grundintäkt per m²:** {grundintakt:.2f} kr  
