@@ -60,13 +60,10 @@ editable_skord_data = st.data_editor(
         "Pris (kr/kg)": st.column_config.NumberColumn(disabled=False),
         "Grundintäkt (kr/m²)": st.column_config.NumberColumn(disabled=True),
         "Intäkt per m² (kr)": st.column_config.NumberColumn(disabled=True)
-    },
-    disabled=["Land", "Grundintäkt (kr/m²)", "Intäkt per m² (kr)"]
-)
+    }
 )
 editable_skord_data["Grundintäkt (kr/m²)"] = editable_skord_data["Skörd (kg/m²)"] * editable_skord_data["Pris (kr/kg)"]
 editable_skord_data["Intäkt per m² (kr)"] = editable_skord_data["Grundintäkt (kr/m²)"] * (1 + skordeokning / 100) * (andel_sonicflora / 100)
-
 
 # Standarddata för redigering
 
