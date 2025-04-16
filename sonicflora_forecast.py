@@ -139,4 +139,4 @@ st.line_chart(data=total_by_year.set_index("År")[["Mjukvaruintäkt (kr)", "Hår
 
 # Visa tabell
 st.subheader("📘 Sammanställning per år")
-    st.dataframe(total_by_year, use_container_width=True)
+st.dataframe(total_by_year, use_container_width=True)
