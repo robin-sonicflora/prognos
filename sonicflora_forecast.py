@@ -25,11 +25,6 @@ andel_sonicflora = st.sidebar.slider("SonicFloras andel av ökningen (%)", 0, 10
 hardware_units_per_45000 = 724
 hardware_unit_price = 500  # kr per enhet
 
-editable_skord_data = st.data_editor(skord_data, use_container_width=True)
-editable_skord_data["Intäkt per m² (kr)"] = editable_skord_data["Skörd (kg/m²)"] * editable_skord_data["Pris (kr/kg)"] * (1 + skordeokning / 100) * (andel_sonicflora / 100)
-
-skord_data["Intäkt per m² (kr)"] = skord_data["Skörd (kg/m²)"] * skord_data["Pris (kr/kg)"] * (1 + skordeokning / 100) * (andel_sonicflora / 100)
-
 st.subheader("📐 Uträkning av intäkt per m²")
 st.markdown("Formel: Skörd × Pris × (1 + ökning) × andel till SonicFlora")
 editable_skord_data = st.data_editor(
