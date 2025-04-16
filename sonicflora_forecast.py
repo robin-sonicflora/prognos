@@ -135,7 +135,7 @@ if not results_df.empty:
 
     # Visa diagram över intäkter per år
 st.markdown("**Mjukvaruintäkt, Hårdvaruintäkt och Total intäkt (kr)**")
-total_by_year_plot = total_by_year[total_by_year["År"] != "Totalt"]
+total_by_year_plot["År"] = total_by_year_plot["År"].astype(str)
 st.line_chart(data=total_by_year_plot.set_index("År")[["Mjukvaruintäkt (kr)", "Hårdvaruintäkt (kr)", "Total intäkt (kr)"]])
 
 # Visa tabell
