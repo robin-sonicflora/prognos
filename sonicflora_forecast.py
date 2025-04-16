@@ -275,8 +275,8 @@ st.subheader("🧪 Testa ett scenario manuellt")
 test_area = st.number_input("Odlingsyta (m²)", value=45000)
 test_skord = st.number_input("Skörd (kg/m²)", value=42.2)
 test_pris = st.number_input("Pris (kr/kg)", value=12.42)
-test_okning = st.slider("Skördeökning (%)", 0, 100, 20)
-test_andel = st.slider("SonicFloras andel av ökningen (%)", 0, 100, 20)
+test_okning = st.slider("Skördeökning (%) (test)", 0, 100, 20)
+test_andel = st.slider("SonicFloras andel av ökningen (%) (test)", 0, 100, 20)
 
 # Beräkningar
 grundintakt = test_skord * test_pris
