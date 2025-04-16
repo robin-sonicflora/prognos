@@ -25,25 +25,6 @@ andel_sonicflora = st.sidebar.slider("SonicFloras andel av ökningen (%)", 0, 10
 hardware_units_per_45000 = 724
 hardware_unit_price = 500  # kr per enhet
 
-# Uträkning: Intäkt per m² per land baserat på skörd, pris, ökning och andel
-skord_data = pd.DataFrame({
-    "Land": [
-        "Sverige", "Norge", "Danmark", "Finland", "Island",
-        "Nederländerna", "Storbritannien", "Tyskland", "Belgien",
-        "Österrike", "Irland", "Spanien", "Italien"
-    ],
-    "Skörd (kg/m²)": [
-        42.2, 31.9, 39.2, 44.9, 29.6,
-        50.5, 35.4, 27.4, 47.4,
-        29.2, 37.3, 8.8, 5.8
-    ],
-    "Pris (kr/kg)": [
-        12.42, 23.94, 27.60, 17.33, 51.97,
-        8.66, 16.62, 15.77, 8.01,
-        9.57, 27.12, 3.23, 2.10
-    ]
-})
-
 editable_skord_data = st.data_editor(skord_data, use_container_width=True)
 editable_skord_data["Intäkt per m² (kr)"] = editable_skord_data["Skörd (kg/m²)"] * editable_skord_data["Pris (kr/kg)"] * (1 + skordeokning / 100) * (andel_sonicflora / 100)
 
