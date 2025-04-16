@@ -186,4 +186,61 @@ if not results_df.empty:
                 html_table += f"<td>{val}</td>"
         html_table += "</tr>"
     html_table += "</tbody></table>"
-    st.markdown(html_table, unsafe_allow_html=True)
+    import streamlit.components.v1 as components
+
+copy_table_html = """
+<style>
+.copy-btn {
+  font-size: 12px;
+  padding: 2px 6px;
+  border: 1px solid #aaa;
+  border-radius: 6px;
+  background-color: #f9f9f9;
+  margin-left: 8px;
+  cursor: pointer;
+}
+.copy-btn:hover {
+  background-color: #eee;
+}
+table.custom-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+table.custom-table th, table.custom-table td {
+  border: 1px solid #ddd;
+  padding: 6px;
+  text-align: left;
+  font-size: 14px;
+}
+table.custom-table th {
+  background-color: #f5f5f5;
+}
+</style>
+<script>
+function copyText(value) {
+  navigator.clipboard.writeText(value);
+  alert('Kopierat: ' + value);
+}
+</script>
+<table class='custom-table'>
+<thead><tr>"""
+for col in total_by_year.columns:
+    copy_table_html += f"<th>{col}</th>"
+copy_table_html += "</tr></thead><tbody>"
+
+for _, row in total_by_year.iterrows():
+    copy_table_html += "<tr>"
+    for col in total_by_year.columns:
+        val = row[col]
+        if isinstance(val, (int, float)) and "intäkt" in col:
+            display_val = f"{val:,.0f}".replace(",", " ") + " kr"
+            copy_table_html += f"<td>{display_val}<button class='copy-btn' onclick=\"copyText('{int(val)}')\">Kopiera</button></td>"
+        elif isinstance(val, (int, float)) and "yta" in col:
+            display_val = f"{val:,.0f}".replace(",", " ") + " m²"
+            copy_table_html += f"<td>{display_val}</td>"
+        else:
+            copy_table_html += f"<td>{val}</td>"
+    copy_table_html += "</tr>"
+copy_table_html += "</tbody></table>"
+
+components.html(copy_table_html, height=600, scrolling=True)
