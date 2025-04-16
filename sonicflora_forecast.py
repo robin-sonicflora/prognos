@@ -73,7 +73,6 @@ for _, row in input_df.iterrows():
 
             results.append({
                 "År": int(year),
-                "År_str": str(year),
                 "Land": land,
                 "Odlingsyta (m²)": round(current_area),
                 "Intäkt per m² (kr)": revenue_per_m2,
@@ -89,18 +88,13 @@ if not results_df.empty:
     st.subheader(":bar_chart: Resultat")
     st.dataframe(results_df, use_container_width=True)
 
-    total_by_year = results_df.groupby(["År", "År_str"])[["Total årsintäkt (kr)", "Hårdvaruintäkt (kr)", "Total intäkt inkl hårdvara (kr)"]].sum().reset_index()
+    total_by_year = results_df.groupby("År")[["Total årsintäkt (kr)", "Hårdvaruintäkt (kr)", "Total intäkt inkl hårdvara (kr)"]].sum().reset_index()
     total_by_year = total_by_year.sort_values("År")
-    total_by_year = total_by_year.set_index("År_str")
+    total_by_year["År"] = total_by_year["År"].astype(str)
 
     st.markdown("**Total årsintäkt (kr)**")
-    st.line_chart(data=total_by_year[["Total årsintäkt (kr)", "Hårdvaruintäkt (kr)", "Total intäkt inkl hårdvara (kr)"]])
+    st.line_chart(data=total_by_year.set_index("År")[["Total årsintäkt (kr)", "Hårdvaruintäkt (kr)", "Total intäkt inkl hårdvara (kr)"]])
 
     # Ny sektion: sammanställning per år
     st.subheader("📘 Sammanställning per år")
-    summary_df = total_by_year.reset_index().rename(columns={"År_str": "År"})
-    summary_df["År"] = summary_df["År"].astype(str)
-    for col in summary_df.columns:
-        if col != "År":
-            summary_df[col] = pd.to_numeric(summary_df[col], errors="coerce")
-    st.dataframe(summary_df, use_container_width=True)
+    st.dataframe(total_by_year, use_container_width=True)
