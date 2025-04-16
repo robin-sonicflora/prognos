@@ -79,4 +79,5 @@ if not results_df.empty:
     total_by_year = results_df.groupby(["År", "År_str"])["Total årsintäkt (mSEK)"].sum().reset_index()
     total_by_year = total_by_year.sort_values("År")
     total_by_year = total_by_year.set_index("År_str")
+    st.markdown("**Total årsintäkt (mSEK)**")
     st.line_chart(data=total_by_year[["Total årsintäkt (mSEK)"]])
