@@ -270,24 +270,28 @@ copy_table_html += "</tbody></table>"
 components.html(copy_table_html, height=600, scrolling=True)
 
 # === Ny sektion: Manuellt testscenario ===
+# === Ny sektion: Manuellt testscenario ===
 st.subheader("🧪 Testa ett scenario manuellt")
 col1, _ = st.columns([1, 2])
 with col1:
-    test_area    = st.number_input("Odlingsyta (m²)",               value=45000)
-    test_skord   = st.number_input("Skörd (kg/m²)",                value=42.2)
-    test_pris    = st.number_input("Pris (kr/kg)",                 value=12.42)
-    test_okning  = st.slider("Skördeökning (%) (test)",            0, 100, 20)
-    test_andel   = st.slider("SonicFloras andel av ökningen (%) (test)", 0, 100, 20)
+    test_area          = st.number_input("Odlingsyta (m²)",                     value=45000)
+    test_skord         = st.number_input("Skörd (kg/m²)",                      value=42.2)
+    test_pris          = st.number_input("Pris (kr/kg)",                       value=12.42)
+    test_okning        = st.slider("Skördeökning (%) (test)",                  0, 100, 20)
+    test_andel         = st.slider("SonicFloras andel av ökningen (%) (test)", 0, 100, 20)
 
     # Beräkningar
-    grundintakt         = test_skord * test_pris
-    okning_per_m2       = grundintakt * (test_okning  / 100)
-    sonicflora_per_m2   = okning_per_m2 * (test_andel / 100)
-    total_intakt        = sonicflora_per_m2 * test_area
+    grundintakt       = test_skord * test_pris
+    okning_per_m2     = grundintakt * (test_okning  / 100)
+    sonicflora_per_m2 = okning_per_m2 * (test_andel   / 100)
+    total_intakt      = sonicflora_per_m2 * test_area
+
+    # Formatera totalintäkt med mellanslag som tusentalsavgränsare
+    total_str = f"{total_intakt:,.0f}".replace(",", " ")
 
     st.markdown(f"""
     **Grundintäkt per m²:** {grundintakt:.2f} kr  
     **Ökning per m²:** {okning_per_m2:.2f} kr  
     **Sonicfloras andel per m²:** {sonicflora_per_m2:.2f} kr  
-    **Total intäkt:** {total_intakt:,.0f} kr
+    **Total intäkt:** {total_str} kr
     """)
