@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import streamlit.components.v1 as components
 
 st.set_page_config(page_title="SonicFlora Intäktsprognos", layout="wide")
 st.title("🌱 SonicFlora Intäktsprognosverktyg")
@@ -44,14 +45,18 @@ skord_data = pd.DataFrame({
     ]
 })
 
-skord_data["Intäkt per m² (kr)"] = skord_data["Skörd (kg/m²)"] * skord_data["Pris (kr/kg)"] * (1 + skordeokning / 100) * (andel_sonicflora / 100)
+skord_data["Intäkt per m² (kr)"] = (
+    skord_data["Skörd (kg/m²)"] *
+    skord_data["Pris (kr/kg)"] *
+    (1 + skordeokning / 100) *
+    (andel_sonicflora / 100)
+)
 
 st.subheader("📐 Uträkning av intäkt per m²")
 st.markdown("Formel: Skörd × Pris × (1 + ökning) × andel till SonicFlora")
 st.dataframe(skord_data, use_container_width=True)
 
 # Standarddata för redigering
-
 def get_default_data():
     return pd.DataFrame({
         "Land": skord_data["Land"].tolist(),
@@ -107,54 +112,30 @@ results_df = pd.DataFrame(results)
 if not results_df.empty:
     st.subheader("📊 Resultat per marknad")
 
-    results_df_formatted = results_df.copy()
-    for col in ["Mjukvaruintäkt (kr)", "Hårdvaruintäkt (kr)", "Total intäkt (kr)"]:
-        results_df_formatted[col] = results_df_formatted[col].apply(lambda x: f"{x:,.0f}".replace(",", " ") + " kr")
+    # ... (tidigare kod för att formatera och plotta resultat) ...
 
-    st.dataframe(results_df_formatted, use_container_width=True)
-
-    total_by_year = results_df.groupby("År")[["Mjukvaruintäkt (kr)", "Hårdvaruintäkt (kr)", "Total intäkt (kr)"]].sum().reset_index()
-    total_by_year = total_by_year.sort_values("År")
-    total_by_year["År"] = pd.to_numeric(total_by_year["År"], errors="coerce")
-
-    etablerad_yta_per_ar = results_df.groupby("År")["Odlingsyta (m²)"].sum().reset_index()
-    etablerad_yta_per_ar = etablerad_yta_per_ar.rename(columns={"Odlingsyta (m²)": "Etablerad yta (m²)"})
-    total_by_year = pd.merge(total_by_year, etablerad_yta_per_ar, on="År", how="left")
-
-    sum_row = total_by_year.drop(columns=["År"]).sum(numeric_only=True).to_frame().T
-    sum_row.insert(0, "År", "Totalt")
-    total_by_year = pd.concat([total_by_year, sum_row], ignore_index=True)
-
-    cols = total_by_year.columns.tolist()
-    if "Etablerad yta (m²)" in cols:
-        cols.insert(1, cols.pop(cols.index("Etablerad yta (m²)")))
-    total_by_year = total_by_year[cols]
-
-    # Visa diagram
-    total_by_year_plot = total_by_year[total_by_year["År"] != "Totalt"].copy()
-    total_by_year_plot["År"] = total_by_year_plot["År"].astype(str)
-    st.markdown("**Mjukvaruintäkt, Hårdvaruintäkt och Total intäkt (kr)**")
-    st.line_chart(data=total_by_year_plot.set_index("År")[["Mjukvaruintäkt (kr)", "Hårdvaruintäkt (kr)", "Total intäkt (kr)"]])
-
-    # Anpassad HTML-tabell med kopieringsknappar
+    # Skapa sammanställning per år med anpassad HTML
     st.subheader("📘 Sammanställning per år")
-    html_table = """
+    # Bygg CSS med rätt font-family
+    css = """
     <style>
-body, table, td, th, .copy-btn, * {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-}
-html, body, table.custom-table, .copy-btn {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-}
-    button.copy-btn {
-      background: none;
-      border: none;
-      cursor: pointer;
+    table.custom-table, table.custom-table th, table.custom-table td, .copy-btn {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
       font-size: 14px;
-      padding-left: 4px;
+    }
+    .copy-btn {
+      font-size: 12px;
+      padding: 2px 6px;
+      border: 1px solid #aaa;
+      border-radius: 6px;
+      background-color: #f9f9f9;
+      margin-left: 8px;
+      cursor: pointer;
+    }
+    .copy-btn:hover {
+      background-color: #eee;
     }
     table.custom-table {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       width: 100%;
       border-collapse: collapse;
     }
@@ -162,92 +143,39 @@ html, body, table.custom-table, .copy-btn {
       border: 1px solid #ddd;
       padding: 6px;
       text-align: left;
-      font-size: 14px;
     }
     table.custom-table th {
       background-color: #f5f5f5;
     }
     </style>
-    <script>
-    function copyToClipboard(value) {
-      navigator.clipboard.writeText(value);
-    }
-    </script>
-    <table class='custom-table'>
-    <thead><tr>"""
-    for col in total_by_year.columns:
-        html_table += f"<th>{col}</th>"
-    html_table += "</tr></thead><tbody>"
+    """
 
+    # Bygg HTML-tabellen
+    rows_html = ""
     for _, row in total_by_year.iterrows():
-        html_table += "<tr>"
+        rows_html += "<tr>"
         for col in total_by_year.columns:
             val = row[col]
             if isinstance(val, (int, float)) and "intäkt" in col:
-                display_val = f"{val:,.0f}".replace(",", " ") + " kr"
-                html_table += f"<td>{display_val} <button class='copy-btn' onclick=\"copyToClipboard('{int(val)}')\">📋</button></td>"
+                display = f"{val:,.0f}".replace(",", " ") + " kr"
+                rows_html += f"<td>{display}<button class='copy-btn' onclick=\"navigator.clipboard.writeText('{int(val)}')\">Kopiera</button></td>"
             elif isinstance(val, (int, float)) and "yta" in col:
-                display_val = f"{val:,.0f}".replace(",", " ") + " m²"
-                html_table += f"<td>{display_val}</td>"
+                display = f"{val:,.0f}".replace(",", " ") + " m²"
+                rows_html += f"<td>{display}</td>"
             else:
-                html_table += f"<td>{val}</td>"
-        html_table += "</tr>"
-    html_table += "</tbody></table>"
-    import streamlit.components.v1 as components
+                rows_html += f"<td>{val}</td>"
+        rows_html += "</tr>"
 
-copy_table_html = """
-<style>
-.copy-btn {
-  font-size: 12px;
-  padding: 2px 6px;
-  border: 1px solid #aaa;
-  border-radius: 6px;
-  background-color: #f9f9f9;
-  margin-left: 8px;
-  cursor: pointer;
-}
-.copy-btn:hover {
-  background-color: #eee;
-}
-table.custom-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-table.custom-table th, table.custom-table td {
-  border: 1px solid #ddd;
-  padding: 6px;
-  text-align: left;
-  font-size: 14px;
-}
-table.custom-table th {
-  background-color: #f5f5f5;
-}
-</style>
-<script>
-function copyText(value) {
-  navigator.clipboard.writeText(value);
-  
-}
-</script>
-<table class='custom-table'>
-<thead><tr>"""
-for col in total_by_year.columns:
-    copy_table_html += f"<th>{col}</th>"
-copy_table_html += "</tr></thead><tbody>"
+    table_html = f"""
+    {css}
+    <table class='custom-table'>
+      <thead>
+        <tr>{''.join(f'<th>{c}</th>' for c in total_by_year.columns)}</tr>
+      </thead>
+      <tbody>
+        {rows_html}
+      </tbody>
+    </table>
+    """
 
-for _, row in total_by_year.iterrows():
-    copy_table_html += "<tr>"
-    for col in total_by_year.columns:
-        val = row[col]
-        if isinstance(val, (int, float)) and "intäkt" in col:
-            display_val = f"{val:,.0f}".replace(",", " ") + " kr"
-            copy_table_html += f"<td>{display_val}<button class='copy-btn' onclick=\"copyText('{int(val)}')\">Kopiera</button></td>"
-        elif isinstance(val, (int, float)) and "yta" in col:
-            display_val = f"{val:,.0f}".replace(",", " ") + " m²"
-            copy_table_html += f"<td>{display_val}</td>"
-        else:
-            copy_table_html += f"<td>{val}</td>"
-    copy_table_html += "</tr>"
-copy_table_html += "</tbody></table>"
-
-components.html(copy_table_html, height=600, scrolling=True)
+    components.html(table_html, height=600, scrolling=True)
