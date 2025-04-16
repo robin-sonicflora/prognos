@@ -116,9 +116,7 @@ results_df_formatted = results_df.copy()
 for col in ["Mjukvaruintäkt (kr)", "Hårdvaruintäkt (kr)", "Total intäkt (kr)"]:
     results_df_formatted[col] = results_df_formatted[col].apply(lambda x: f"{x:,.0f}".replace(",", " ") + " kr")
 
-st.dataframe(results_df_formatted, use_container_width=True)
-
-    total_by_year = results_df.groupby("År")[["Mjukvaruintäkt (kr)", "Hårdvaruintäkt (kr)", "Total intäkt (kr)"]].sum().reset_index()
+st.dataframe(results_df_formatted, use_container_width=True)total_by_year = results_df.groupby("År")[["Mjukvaruintäkt (kr)", "Hårdvaruintäkt (kr)", "Total intäkt (kr)"]].sum().reset_index()
     total_by_year = total_by_year.sort_values("År")
     total_by_year["År"] = pd.to_numeric(total_by_year["År"], errors="coerce")
 
