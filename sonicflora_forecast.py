@@ -79,23 +79,19 @@ editable_skord_data["Intäkt för Sonicflora per m² (kr)"] = editable_skord_dat
 
 def get_default_data():
     return pd.DataFrame({
-        "Land": editable_skord_data["Land"].tolist(),
-        "Startår": [
-            2027, 2028, 2028, 2029, 2029,
-            2030, 2030, 2030, 2031,
-            2032, 2032, 2033, 2034
-        ],
-        "Startyta (m²)": [45000] * 13,
-        "Tillväxttakt (%/år)": [10] * 13,
-        "Intäkt för Sonicflora per m² (kr)": editable_skord_data["Intäkt för Sonicflora per m² (kr)"].round(2).tolist()
+        "Land":            skord_data["Land"].tolist(),
+        "Startår":         [2027, 2028, 2028, 2029, 2029, 2030, 2030, 2030, 2031, 2032, 2032, 2033, 2034],
+        "Startyta (m²)":   [45000] * len(skord_data),
+        "Tillväxttakt (%/år)": [10] * len(skord_data),
+        "Intäkt per m² (kr)": skord_data["Intäkt per m² (kr)"].round(2).tolist()
     })
-
 st.subheader("🌍 Marknadsdata")
 input_df = st.data_editor(
     get_default_data(),
     num_rows="dynamic",
     use_container_width=True
 )
+
 
 # Beräkningar
 results = []
