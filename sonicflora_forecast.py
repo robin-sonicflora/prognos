@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
 
 st.set_page_config(page_title="SonicFlora Intäktsprognos", layout="wide")
 st.title("🌱 SonicFlora Intäktsprognosverktyg")
@@ -77,14 +76,7 @@ if not results_df.empty:
     st.subheader(":bar_chart: Resultat")
     st.dataframe(results_df, use_container_width=True)
 
-    total_by_year = results_df.groupby("År")["Total årsintäkt (mSEK)"].sum().reset_index()
-
-    # Plot med matplotlib
-    fig, ax = plt.subplots()
-    ax.plot(total_by_year["År"], total_by_year["Total årsintäkt (mSEK)"], marker='o')
-    ax.set_xlabel("År")
-    ax.set_ylabel("Total årsintäkt (mSEK)")
-    ax.set_title("Prognos: Total årsintäkt per år")
-    ax.grid(True)
-    plt.xticks(rotation=0)
-    st.pyplot(fig)
+    total_by_year = results_df.groupby(["År", "År_str"])["Total årsintäkt (mSEK)"].sum().reset_index()
+    total_by_year = total_by_year.sort_values("År")
+    total_by_year = total_by_year.set_index("År_str")
+    st.line_chart(data=total_by_year[["Total årsintäkt (mSEK)"]])
