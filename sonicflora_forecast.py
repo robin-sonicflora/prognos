@@ -55,11 +55,14 @@ editable_skord_data = st.data_editor(
     skord_data,
     use_container_width=True,
     column_config={
+        "Land": st.column_config.TextColumn(disabled=True),
         "Skörd (kg/m²)": st.column_config.NumberColumn(disabled=False),
         "Pris (kr/kg)": st.column_config.NumberColumn(disabled=False),
-        "Land": st.column_config.TextColumn(disabled=True)
+        "Grundintäkt (kr/m²)": st.column_config.NumberColumn(disabled=True),
+        "Intäkt per m² (kr)": st.column_config.NumberColumn(disabled=True)
     },
-    disabled=["Land"]
+    disabled=["Land", "Grundintäkt (kr/m²)", "Intäkt per m² (kr)"]
+)
 )
 editable_skord_data["Grundintäkt (kr/m²)"] = editable_skord_data["Skörd (kg/m²)"] * editable_skord_data["Pris (kr/kg)"]
 editable_skord_data["Intäkt per m² (kr)"] = editable_skord_data["Grundintäkt (kr/m²)"] * (1 + skordeokning / 100) * (andel_sonicflora / 100)
