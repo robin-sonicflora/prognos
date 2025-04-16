@@ -8,7 +8,7 @@ st.markdown("""
 Fyll i parametrar för varje marknad nedan. Verktyget räknar ut:
 - Tillväxt av odlingsyta (baserat på startyta och tillväxttakt)
 - Årlig intäkt per marknad
-- Totalintäkt under vald prognosperiod
+- Total intäkt under vald prognosperiod
 """)
 
 # Sidopanel: Inställningar
@@ -21,13 +21,39 @@ years = list(range(start_year, end_year + 1))
 hardware_units_per_45000 = 724
 hardware_unit_price = 500  # kr per enhet
 
-# Exempeltabell med redigerbara värden
+# Uträkning: Intäkt per m² per land baserat på skörd, pris, ökning och andel
+skord_data = pd.DataFrame({
+    "Land": [
+        "Sverige", "Norge", "Danmark", "Finland", "Island",
+        "Nederländerna", "Storbritannien", "Tyskland", "Belgien",
+        "Österrike", "Irland", "Spanien", "Italien"
+    ],
+    "Skörd (kg/m²)": [
+        42.2, 31.9, 39.2, 44.9, 29.6,
+        50.5, 35.4, 27.4, 47.4,
+        29.2, 37.3, 8.8, 5.8
+    ],
+    "Pris (kr/kg)": [
+        12.42, 23.94, 27.60, 17.33, 51.97,
+        8.66, 16.62, 15.77, 8.01,
+        9.57, 27.12, 3.23, 2.10
+    ]
+})
+
+skord_data["Intäkt per m² (kr)"] = skord_data["Skörd (kg/m²)"] * skord_data["Pris (kr/kg)"] * 1.2 * 0.2
+
+st.subheader("📐 Uträkning av intäkt per m²")
+st.markdown("Formel: Skörd × Pris × 1.2 (ökning) × 0.2 (andel till SonicFlora)")
+st.dataframe(skord_data, use_container_width=True)
+
+# Standarddata för redigering
+
 def get_default_data():
     return pd.DataFrame({
         "Land": [
-            "Sweden", "Norway", "Denmark", "Finland", "Iceland",
-            "Netherlands", "United Kingdom", "Germany", "Belgium",
-            "Austria", "Ireland", "Spain", "Italy"
+            "Sverige", "Norge", "Danmark", "Finland", "Island",
+            "Nederländerna", "Storbritannien", "Tyskland", "Belgien",
+            "Österrike", "Irland", "Spanien", "Italien"
         ],
         "Startår": [
             2027, 2028, 2028, 2029, 2029,
@@ -35,15 +61,11 @@ def get_default_data():
             2032, 2032, 2033, 2034
         ],
         "Startyta (m²)": [45000] * 13,
-        "Tillväxttakt (%/year)": [10] * 13,
-        "Intäkt per m² (kr)": [
-            125.79, 183.28, 259.66, 186.75, 369.19,
-            173.89, 141.23, 109.01, 160.28,
-            67.11, 202.42, 6.81, 2.45
-        ]
+        "Tillväxttakt (%/år)": [10] * 13,
+        "Intäkt per m² (kr)": skord_data["Intäkt per m² (kr)"].round(2).tolist()
     })
 
-st.subheader("🌐 Marknadsdata")
+st.subheader("🌍 Marknadsdata")
 input_df = st.data_editor(
     get_default_data(),
     num_rows="dynamic",
@@ -56,14 +78,13 @@ for _, row in input_df.iterrows():
     land = row["Land"]
     year_intro = int(row["Startår"])
     area = float(row["Startyta (m²)"])
-    growth_rate = float(row["Tillväxttakt (%/year)"]) / 100
+    growth_rate = float(row["Tillväxttakt (%/år)"]) / 100
     revenue_per_m2 = float(row["Intäkt per m² (kr)"])
 
     current_area = area
     for year in years:
         if year >= year_intro:
             total_revenue = current_area * revenue_per_m2
-            # Hårdvaruintäkt endast på NY yta detta år
             if year == year_intro:
                 new_area = current_area
             else:
@@ -76,30 +97,25 @@ for _, row in input_df.iterrows():
                 "Land": land,
                 "Odlingsyta (m²)": round(current_area),
                 "Intäkt per m² (kr)": revenue_per_m2,
-                "Total årsintäkt (kr)": round(total_revenue),
+                "Mjukvaruintäkt (kr)": round(total_revenue),
                 "Hårdvaruintäkt (kr)": round(hardware_revenue),
-                "Total intäkt inkl hårdvara (kr)": round(total_revenue + hardware_revenue)
+                "Total intäkt (kr)": round(total_revenue + hardware_revenue)
             })
             current_area *= (1 + growth_rate)
 
-# Visa resultat
+# Resultat
 results_df = pd.DataFrame(results)
 if not results_df.empty:
-    st.subheader(":bar_chart: Resultat")
+    st.subheader("📊 Resultat per marknad")
     st.dataframe(results_df, use_container_width=True)
 
-    total_by_year = results_df.groupby("År")[["Total årsintäkt (kr)", "Hårdvaruintäkt (kr)", "Total intäkt inkl hårdvara (kr)"]].sum().reset_index()
+    total_by_year = results_df.groupby("År")[["Mjukvaruintäkt (kr)", "Hårdvaruintäkt (kr)", "Total intäkt (kr)"]].sum().reset_index()
     total_by_year = total_by_year.sort_values("År")
     total_by_year["År"] = total_by_year["År"].astype(str)
 
     st.markdown("**Mjukvaruintäkt, Hårdvaruintäkt och Total intäkt (kr)**")
-    st.line_chart(data=total_by_year.set_index("År")[["Total årsintäkt (kr)", "Hårdvaruintäkt (kr)", "Total intäkt inkl hårdvara (kr)"]])
+    st.line_chart(data=total_by_year.set_index("År")[["Mjukvaruintäkt (kr)", "Hårdvaruintäkt (kr)", "Total intäkt (kr)"]])
 
-    # Ny sektion: sammanställning per år
+    # Sammanställning
     st.subheader("📘 Sammanställning per år")
-    renamed_total_by_year = total_by_year.rename(columns={
-    "Total årsintäkt (kr)": "Mjukvaruintäkt (kr)",
-    "Hårdvaruintäkt (kr)": "Hårdvaruintäkt (kr)",
-    "Total intäkt inkl hårdvara (kr)": "Total intäkt (kr)"
-})
-st.dataframe(renamed_total_by_year, use_container_width=True)
+    st.dataframe(total_by_year, use_container_width=True)
