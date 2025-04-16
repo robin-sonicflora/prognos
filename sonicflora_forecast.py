@@ -147,5 +147,15 @@ sum_row = total_by_year.drop(columns=["År"]).sum(numeric_only=True).to_frame().
 sum_row.insert(0, "År", "Totalt")
 total_by_year = pd.concat([total_by_year, sum_row], ignore_index=True)
 
+# Rensa dubletter från merge
+if "Etablerad yta (m²)_x" in total_by_year.columns and "Etablerad yta (m²)_y" in total_by_year.columns:
+    total_by_year = total_by_year.drop(columns=["Etablerad yta (m²)_x", "Etablerad yta (m²)_y"])
+
+# Flytta kolumnen "Etablerad yta (m²)" efter "År"
+cols = total_by_year.columns.tolist()
+if "Etablerad yta (m²)" in cols:
+    cols.insert(1, cols.pop(cols.index("Etablerad yta (m²)")))
+total_by_year = total_by_year[cols]
+
 # Visa tabell
 st.dataframe(total_by_year, use_container_width=True)
