@@ -133,6 +133,10 @@ if not results_df.empty:
         cols.insert(1, cols.pop(cols.index("Etablerad yta (m²)")))
     total_by_year = total_by_year[cols]
 
-    # Visa tabell
+    # Visa diagram över intäkter per år
+st.markdown("**Mjukvaruintäkt, Hårdvaruintäkt och Total intäkt (kr)**")
+st.line_chart(data=total_by_year.set_index("År")[["Mjukvaruintäkt (kr)", "Hårdvaruintäkt (kr)", "Total intäkt (kr)"]])
+
+# Visa tabell
     st.subheader("📘 Sammanställning per år")
     st.dataframe(total_by_year, use_container_width=True)
