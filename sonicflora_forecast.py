@@ -45,16 +45,17 @@ skord_data = pd.DataFrame({
 })
 
 editable_skord_data = st.data_editor(skord_data, use_container_width=True)
-editable_skord_data["Intäkt för Sonicflora per m² (kr)"] = editable_skord_data["Skörd (kg/m²)"] * editable_skord_data["Pris (kr/kg)"] * (1 + skordeokning / 100) * (andel_sonicflora / 100)
 
-# 1) Räkna ut grundintäkt per m²
-grundintakt = skord_data["Skörd (kg/m²)"] * skord_data["Pris (kr/kg)"]
-
-# 2) Ta bara ökningen och SonicFloras andel
-skord_data["Intäkt för Sonicflora per m² (kr)"] = (
-    grundintakt
-    * (skordeokning    / 100)   # bara procentuell ökning
-    * (andel_sonicflora / 100)   # SonicFloras andel av ökningen
+# Räkna grundintäkt per m²
+grundintakt_edit = (
+    editable_skord_data["Skörd (kg/m²)"]
+    * editable_skord_data["Pris (kr/kg)"]
+)
+# Beräkna Sonicfloras intäkt av ökningen
+editable_skord_data["Intäkt för Sonicflora per m² (kr)"] = (
+    editable_skord_data["Grundintäkt (kr/m²)"]
+    * (skordeokning    / 100)   # bara ökningen
+    * (andel_sonicflora / 100)   # andel av den
 )
 
 st.subheader("📐 Uträkning av intäkt per m²")
