@@ -79,7 +79,6 @@ st.markdown("Formel: Skörd × Pris × (1 + ökning) × andel till SonicFlora")
         "Pris (kr/kg)": st.column_config.NumberColumn(disabled=False),
         "Grundintäkt (kr/m²)": st.column_config.NumberColumn(disabled=True),
         "Intäkt för Sonicflora per m² (kr)": st.column_config.NumberColumn(disabled=True)
-    },
     disabled=["Land", "Grundintäkt (kr/m²)", "Intäkt för Sonicflora per m² (kr)"]
 )
 skord_data["Grundintäkt (kr/m²)"] = skord_data["Skörd (kg/m²)"] * skord_data["Pris (kr/kg)"]
