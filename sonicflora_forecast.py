@@ -44,8 +44,11 @@ skord_data = pd.DataFrame({
     ]
 })
 
-editable_skord_data = st.data_editor(skord_data, use_container_width=True)
-
+skord_data = st.data_editor(
+    skord_data,
+    use_container_width=True,
+    column_config={ … }
+)
 # 1) Räkna ut grundintäkt per m²
 grundintakt = skord_data["Skörd (kg/m²)"] * skord_data["Pris (kr/kg)"]
 
@@ -285,7 +288,17 @@ copy_table_html += "</tbody></table>"
 
 components.html(copy_table_html, height=600, scrolling=True)
 
-# === Ny sektion: Manuellt testscenario ===
+# Konvertera till CSV och koda till bytes
+csv_data = skord_data.to_csv(index=False).encode('utf-8')
+
+# Skapa en knapp som låter användaren ladda ner
+st.download_button(
+    label="Ladda ner redigerad data som CSV",
+    data=csv_data,
+    file_name="skord_data.csv",
+    mime="text/csv",
+)
+
 # === Ny sektion: Manuellt testscenario ===
 st.subheader("🧪 Testa ett scenario manuellt")
 col1, _ = st.columns([1, 2])
