@@ -339,7 +339,7 @@ zip_buffer = io.BytesIO()
 with zipfile.ZipFile(zip_buffer, mode="w", compression=zipfile.ZIP_DEFLATED) as zf:
     zf.writestr("intakt_per_m2.csv", skord_data.to_csv(index=False))
     zf.writestr("marknadsdata.csv",  input_df.to_csv(index=False))
-    zf.writestr("detaljer_per_ar.csv", df_results.to_csv(index=False))
+    zf.writestr("detaljer_per_ar.csv", results_df.to_csv(index=False))
     zf.writestr("sum_per_ar.csv",     total_by_year.to_csv(index=False))
 
 # Hoppa tillbaka till början av bufferten
