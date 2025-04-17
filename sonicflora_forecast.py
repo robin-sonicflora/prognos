@@ -45,10 +45,14 @@ skord_data = pd.DataFrame({
 })
 
 skord_data = st.data_editor(
-    skord_data,
-    use_container_width=True,
-    column_config=
-)
++     skord_data,
++     use_container_width=True,
++     column_config={
++         "Land": st.column_config.TextColumn(disabled=True),
++         "Skörd (kg/m²)": st.column_config.NumberColumn(),
++         "Pris (kr/kg)": st.column_config.NumberColumn(),
++     }
++ )
 # 1) Räkna ut grundintäkt per m²
 grundintakt = skord_data["Skörd (kg/m²)"] * skord_data["Pris (kr/kg)"]
 
@@ -71,16 +75,17 @@ skord_data["Grundintäkt (kr/m²)"] = (
 st.subheader("📐 Uträkning av intäkt per m²")
 st.markdown("Formel: Skörd × Pris × (1 + ökning) × andel till SonicFlora")
 + skord_data = st.data_editor(
-    skord_data,
-    use_container_width=True,
-    column_config=
-        "Land": st.column_config.TextColumn(disabled=True),
-        "Skörd (kg/m²)": st.column_config.NumberColumn(disabled=False),
-        "Pris (kr/kg)": st.column_config.NumberColumn(disabled=False),
-        "Grundintäkt (kr/m²)": st.column_config.NumberColumn(disabled=True),
-        "Intäkt för Sonicflora per m² (kr)": st.column_config.NumberColumn(disabled=True)
-    disabled=["Land", "Grundintäkt (kr/m²)", "Intäkt för Sonicflora per m² (kr)"]
-)
++     skord_data,
++     use_container_width=True,
++     column_config={
++         "Land": st.column_config.TextColumn(disabled=True),
++         "Skörd (kg/m²)": st.column_config.NumberColumn(),
++         "Pris (kr/kg)": st.column_config.NumberColumn(),
++         "Grundintäkt (kr/m²)": st.column_config.NumberColumn(disabled=True),
++         "Intäkt för Sonicflora per m² (kr)": st.column_config.NumberColumn(disabled=True),
++     }
++ )
+
 skord_data["Grundintäkt (kr/m²)"] = skord_data["Skörd (kg/m²)"] * skord_data["Pris (kr/kg)"]
 skord_data["Intäkt för Sonicflora per m² (kr)"] = skord_data["Grundintäkt (kr/m²)"] * (skordeokning / 100) * (andel_sonicflora / 100)
 
@@ -290,13 +295,14 @@ components.html(copy_table_html, height=600, scrolling=True)
 # Konvertera till CSV och koda till bytes
 csv_data = skord_data.to_csv(index=False).encode('utf-8')
 
-# Skapa en knapp som låter användaren ladda ner
-st.download_button(
-    label="Ladda ner redigerad data som CSV",
-    data=csv_data,
-    file_name="skord_data.csv",
-    mime="text/csv",
-)
++ # — Lägg till nedladdningsknapp —
++ csv_data = skord_data.to_csv(index=False).encode("utf-8")
++ st.download_button(
++     label="Ladda ner redigerad intäktsdata som CSV",
++     data=csv_data,
++     file_name="skord_data.csv",
++     mime="text/csv"
++ )
 
 # === Ny sektion: Manuellt testscenario ===
 st.subheader("🧪 Testa ett scenario manuellt")
