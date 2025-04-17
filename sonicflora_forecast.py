@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import io
+import zipfile
 
 st.set_page_config(page_title="SonicFlora Intäktsprognos", layout="wide")
 st.title("🌱 SonicFlora Intäktsprognosverktyg")
@@ -355,4 +356,24 @@ st.download_button(
     data=output,
     file_name="sonicflora_prognos_data.xlsx",
     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+)
+
+# Skapa en in-memory buffer för ZIP-filen
+zip_buffer = io.BytesIO()
+
+# Öppna en ZIP i bufferten och skriv in varje DataFrame som en CSV
+with zipfile.ZipFile(zip_buffer, mode="w", compression=zipfile.ZIP_DEFLATED) as zf:
+    zf.writestr("intakt_per_m2.csv", skord_data.to_csv(index=False))
+    zf.writestr("marknadsdata.csv",  input_df.to_csv(index=False))
+    zf.writestr("detaljer_per_ar.csv", df_results.to_csv(index=False))
+    zf.writestr("sum_per_ar.csv",     total_by_year.to_csv(index=False))
+
+# Hoppa tillbaka till början av bufferten
+zip_buffer.seek(0)
+
+st.download_button(
+    label="Ladda ner all data som ZIP",
+    data=zip_buffer,
+    file_name="sonicflora_prognos_data.zip",
+    mime="application/zip"
 )
