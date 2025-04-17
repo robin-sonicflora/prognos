@@ -74,7 +74,7 @@ skord_data["Grundintäkt (kr/m²)"] = (
 
 st.subheader("📐 Uträkning av intäkt per m²")
 st.markdown("Formel: Skörd × Pris × (1 + ökning) × andel till SonicFlora")
- skord_data = st.data_editor(
+skord_data = st.data_editor(
      skord_data,
      use_container_width=True,
      column_config={
