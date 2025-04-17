@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import io
 
 st.set_page_config(page_title="SonicFlora Intäktsprognos", layout="wide")
 st.title("🌱 SonicFlora Intäktsprognosverktyg")
@@ -339,7 +340,7 @@ import io
 output = io.BytesIO()
 
 # 2) Skriv till Excel med flera ark
-with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+with pd.ExcelWriter(output, engine='openpyxl') as writer:
     skord_data.to_excel(writer, sheet_name='Intäkt per m²', index=False)
     input_df.to_excel(writer, sheet_name='Marknadsdata', index=False)
     df_results.to_excel(writer, sheet_name='Detaljerat per år', index=False)
