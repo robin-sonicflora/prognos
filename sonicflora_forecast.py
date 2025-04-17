@@ -70,10 +70,10 @@ skord_data["Grundintäkt (kr/m²)"] = (
 
 st.subheader("📐 Uträkning av intäkt per m²")
 st.markdown("Formel: Skörd × Pris × (1 + ökning) × andel till SonicFlora")
-editable_skord_data = st.data_editor(
++ skord_data = st.data_editor(
     skord_data,
     use_container_width=True,
-    column_config={
+    column_config={ … }
         "Land": st.column_config.TextColumn(disabled=True),
         "Skörd (kg/m²)": st.column_config.NumberColumn(disabled=False),
         "Pris (kr/kg)": st.column_config.NumberColumn(disabled=False),
@@ -82,15 +82,15 @@ editable_skord_data = st.data_editor(
     },
     disabled=["Land", "Grundintäkt (kr/m²)", "Intäkt för Sonicflora per m² (kr)"]
 )
-editable_skord_data["Grundintäkt (kr/m²)"] = editable_skord_data["Skörd (kg/m²)"] * editable_skord_data["Pris (kr/kg)"]
-editable_skord_data["Intäkt för Sonicflora per m² (kr)"] = editable_skord_data["Grundintäkt (kr/m²)"] * (skordeokning / 100) * (andel_sonicflora / 100)
+skord_data["Grundintäkt (kr/m²)"] = skord_data["Skörd (kg/m²)"] * skord_data["Pris (kr/kg)"]
+skord_data["Intäkt för Sonicflora per m² (kr)"] = skord_data["Grundintäkt (kr/m²)"] * (skordeokning / 100) * (andel_sonicflora / 100)
 
 
 # Standarddata för redigering
 
 def get_default_data():
     return pd.DataFrame({
-        "Land": editable_skord_data["Land"].tolist(),
+        "Land": skord_data["Land"].tolist(),
         "Startår": [
             2027, 2028, 2028, 2029, 2029,
             2030, 2030, 2030, 2031,
@@ -98,7 +98,7 @@ def get_default_data():
         ],
         "Startyta (m²)": [45000] * 13,
         "Tillväxttakt (%/år)": [10] * 13,
-        "Intäkt för Sonicflora per m² (kr)": editable_skord_data["Intäkt för Sonicflora per m² (kr)"].round(2).tolist()
+        "Intäkt för Sonicflora per m² (kr)": skord_data["Intäkt för Sonicflora per m² (kr)"].round(2).tolist()
     })
 
 st.subheader("🌍 Marknadsdata")
