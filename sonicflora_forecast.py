@@ -73,7 +73,7 @@ st.markdown("Formel: Skörd × Pris × (1 + ökning) × andel till SonicFlora")
 + skord_data = st.data_editor(
     skord_data,
     use_container_width=True,
-    column_config={ … }
+    column_config=
         "Land": st.column_config.TextColumn(disabled=True),
         "Skörd (kg/m²)": st.column_config.NumberColumn(disabled=False),
         "Pris (kr/kg)": st.column_config.NumberColumn(disabled=False),
