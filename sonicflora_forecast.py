@@ -47,7 +47,7 @@ skord_data = pd.DataFrame({
 skord_data = st.data_editor(
     skord_data,
     use_container_width=True,
-    column_config={ … }
+    column_config=
 )
 # 1) Räkna ut grundintäkt per m²
 grundintakt = skord_data["Skörd (kg/m²)"] * skord_data["Pris (kr/kg)"]
