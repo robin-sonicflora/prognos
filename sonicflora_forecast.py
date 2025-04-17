@@ -332,32 +332,6 @@ with col1:
     **Total intäkt:** {total_str} kr
     """)
 
-import io
-
-# Efter att du har beräknat alla DataFrames:
-#   skord_data, input_df, df_results, total_by_year
-
-# 1) Skapa en bytes‑buffert
-output = io.BytesIO()
-
-# 2) Skriv till Excel med flera ark
-with pd.ExcelWriter(output, engine='openpyxl') as writer:
-    skord_data.to_excel(writer, sheet_name='Intäkt per m²', index=False)
-    input_df.to_excel(writer, sheet_name='Marknadsdata', index=False)
-    df_results.to_excel(writer, sheet_name='Detaljerat per år', index=False)
-    total_by_year.to_excel(writer, sheet_name='Sum per år', index=False)
-
-# 3) Gör bufferten redo för nedladdning
-output.seek(0)
-
-# 4) Skapa knappen
-st.download_button(
-    label="Ladda ner all data som Excel",
-    data=output,
-    file_name="sonicflora_prognos_data.xlsx",
-    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-)
-
 # Skapa en in-memory buffer för ZIP-filen
 zip_buffer = io.BytesIO()
 
