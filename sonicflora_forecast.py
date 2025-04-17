@@ -52,7 +52,7 @@ skord_data = st.data_editor(
          "Skörd (kg/m²)": st.column_config.NumberColumn(),
          "Pris (kr/kg)": st.column_config.NumberColumn(),
      }
- )
+)
 # 1) Räkna ut grundintäkt per m²
 grundintakt = skord_data["Skörd (kg/m²)"] * skord_data["Pris (kr/kg)"]
 
@@ -84,7 +84,7 @@ st.markdown("Formel: Skörd × Pris × (1 + ökning) × andel till SonicFlora")
          "Grundintäkt (kr/m²)": st.column_config.NumberColumn(disabled=True),
          "Intäkt för Sonicflora per m² (kr)": st.column_config.NumberColumn(disabled=True),
      }
- )
+)
 
 skord_data["Grundintäkt (kr/m²)"] = skord_data["Skörd (kg/m²)"] * skord_data["Pris (kr/kg)"]
 skord_data["Intäkt för Sonicflora per m² (kr)"] = skord_data["Grundintäkt (kr/m²)"] * (skordeokning / 100) * (andel_sonicflora / 100)
