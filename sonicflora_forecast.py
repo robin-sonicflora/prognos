@@ -295,14 +295,14 @@ components.html(copy_table_html, height=600, scrolling=True)
 # Konvertera till CSV och koda till bytes
 csv_data = skord_data.to_csv(index=False).encode('utf-8')
 
- # — Lägg till nedladdningsknapp —
- csv_data = skord_data.to_csv(index=False).encode("utf-8")
- st.download_button(
+# — Lägg till nedladdningsknapp —
+csv_data = skord_data.to_csv(index=False).encode("utf-8")
+st.download_button(
     label="Ladda ner redigerad intäktsdata som CSV",
      data=csv_data,
      file_name="skord_data.csv",
      mime="text/csv"
- )
+)
 
 # === Ny sektion: Manuellt testscenario ===
 st.subheader("🧪 Testa ett scenario manuellt")
