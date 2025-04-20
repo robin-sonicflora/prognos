@@ -159,6 +159,9 @@ if not results_df.empty:
 
     # Sammanställning per år med HTML
     st.subheader("📘 Sammanställning per år")
+    # Ordna kolumner så att Etablerad yta kommer först
+    ordered_cols = ["År", "Etablerad yta (m²)", "Mjukvaruintäkt (kr)", "Hårdvaruintäkt (kr)", "Total intäkt (kr)"]
+    total_by_year = total_by_year[ordered_cols]
     html_table = """
     <style>
       body, table, td, th { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; }
