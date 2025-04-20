@@ -157,11 +157,15 @@ if not results_df.empty:
     total_by_year["År"] = total_by_year["År"].astype(str)
     st.line_chart(data=total_by_year.set_index("År"))
 
-    # Sammanställning per år med HTML
+    # Sammanställning per år
+    sum_row = total_by_year.drop(columns=["År"]).sum(numeric_only=True).to_frame().T
+    sum_row.insert(0, "År", "Totalt")
+    total_by_year = pd.concat([total_by_year, sum_row], ignore_index=True)
+    # Säkra korrekt kolumnordning
+    total_by_year = total_by_year[["År", "Etablerad yta (m²)", "Mjukvaruintäkt (kr)", "Hårdvaruintäkt (kr)", "Total intäkt (kr)"]]
+
     st.subheader("📘 Sammanställning per år")
-    # Ordna kolumner så att Etablerad yta kommer först
-    ordered_cols = ["År", "Etablerad yta (m²)", "Mjukvaruintäkt (kr)", "Hårdvaruintäkt (kr)", "Total intäkt (kr)"]
-    total_by_year = total_by_year[ordered_cols]
+    # Bygg HTML-tabell
     html_table = """
     <style>
       body, table, td, th { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; }
@@ -184,19 +188,16 @@ if not results_df.empty:
             if c == "År":
                 html_table += f"<td>{v}</td>"
             else:
-                if isinstance(v, (int, float)):
-                    unit = 'm²' if 'yta' in c else 'kr'
-                    disp = f"{v:,.0f}".replace(","," ") + (f" {unit}" if unit=='m²' else " kr")
-                    if unit=='kr':
-                        html_table += f"<td>{disp}<button class='copy-btn' onclick=\"copyText('{int(v)}')\">📋</button></td>"
-                    else:
-                        html_table += f"<td>{disp}</td>"
+                unit = 'm²' if 'yta' in c else 'kr'
+                disp = f"{v:,.0f}".replace(","," ") + (f" {unit}" if unit=='m²' else " kr")
+                if unit=='kr':
+                    html_table += f"<td>{disp}<button class='copy-btn' onclick=\"copyText('{int(v)}')\">📋</button></td>"
                 else:
-                    html_table += f"<td>{v}</td>"
+                    html_table += f"<td>{disp}</td>"
         html_table += "</tr>"
     html_table += "</tbody></table>"
     import streamlit.components.v1 as components
-    components.html(html_table, height=600, scrolling=True)
+    components.html(html_table, height=600, scrolling=True)(html_table, height=600, scrolling=True)
 
 # Manuellt testscenario
 st.subheader("🧪 Testa ett scenario manuellt")
