@@ -135,45 +135,8 @@ for col in ["Mjukvaruintäkt (kr)","Hårdvaruintäkt (kr)","Total intäkt (kr)"]
 # totalsumma
 sums = {c: total_summary[c].str.replace("[^0-9]","",regex=True).astype(int).sum() for c in total_summary.columns if c!="År"}
 row = {"År":"Totalt"}
-row.update({k:f"{v:,}".replace(","," ") + (" m²" if "yta" in k else " kr"):v for k,v in sums.items()})
-total_summary = pd.concat([total_summary, pd.DataFrame([row])], ignore_index=True)
-
-st.subheader("📘 Sammanställning per år")
-    # Visa diagram för sammanställningen per år
-    st.markdown("**Etablerad yta, Mjukvaruintäkt, Hårdvaruintäkt och Total intäkt per år**")
-    st.line_chart(
-        data=total_by_year.set_index("År")[[
-            "Etablerad yta (m²)",
-            "Mjukvaruintäkt (kr)",
-            "Hårdvaruintäkt (kr)",
-            "Total intäkt (kr)"
-        ]]
-    )
-    # Bygg HTML-tabell
-st.dataframe(total_summary, use_container_width=True)
-
-# ---- Manuellt testscenario ----
-st.subheader("🧪 Testa ett scenario manuellt")
-col1, _ = st.columns([1,2])
-with col1:
-    test_area = st.number_input("Odlingsyta (m²)", value=45000)
-    test_skord = st.number_input("Skörd (kg/m²)", value=42.2)
-    test_pris = st.number_input("Pris (kr/kg)", value=12.42)
-    test_okning = st.slider("Skördeökning (%) (test)", 0, 100, 20)
-    test_andel = st.slider("SonicFloras andel av ökningen (%) (test)", 0, 100, 20)
-    grund = test_skord * test_pris
-    okn = grund * test_okning/100
-    sf = okn * test_andel/100
-    total = sf * test_area
-    st.markdown(f"**Total intäkt:** {int(total):,}".replace(","," ")+" kr")
-
-# ---- Export ZIP ----
-zip_buffer = io.BytesIO()
-with zipfile.ZipFile(zip_buffer, mode="w") as zf:
-    zf.writestr("intakt_per_m2.csv", skord_data.to_csv(index=False))
-    zf.writestr("marknadsdata.csv", input_df.to_csv(index=False))
-    zf.writestr("tillvaxt_per_ar.csv", growth_long.to_csv(index=False))
-    zf.writestr("detaljer_per_ar.csv", results_df.to_csv(index=False))
-    zf.writestr("sum_per_ar.csv", total_summary.to_csv(index=False))
-zip_buffer.seek(0)
-st.download_button("Ladda ner all data som ZIP", data=zip_buffer, file_name="sonicflora_data.zip")
+    # Lägg till formaterade värden i totalsummeringsraden
+    row.update({
+        k: f"{v:,}".replace(","," ") + (" m²" if "yta" in k else " kr")
+        for k, v in sums.items()
+    })
