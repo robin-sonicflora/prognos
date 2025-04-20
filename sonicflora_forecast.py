@@ -259,13 +259,13 @@ for _, r in total_by_year.iterrows():
             unit = "m²" if "yta" in c else "kr"
             disp = f"{v:,.0f}".replace(",", " ") + (f" {unit}" if unit=="m²" else " kr")
         if unit == "kr":
-html_table += (
-    f"<td>{disp}"
-    f"<button class='copy-btn' onclick=\"copyText('{int(v)}')\">"
-      f"{copy_icon_html}"
-    "</button>"
-    "</td>"
-)
+            html_table += (
+                f"<td>{disp}"
+                f"<button class='copy-btn' onclick=\"copyText('{int(v)}')\">"
+                  f"{copy_icon_html}"
+                "</button>"
+                "</td>"
+            )
             else:
                 html_table += f"<td>{disp}</td>"
 
