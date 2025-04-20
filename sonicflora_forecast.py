@@ -148,8 +148,8 @@ if not results_df.empty:
     display_cols = ["År","Land","Odlingsyta (m²)","Mjukvaruintäkt (kr)","Hårdvaruintäkt (kr)","Total intäkt (kr)"]
     disp = results_df[display_cols].copy()
     for c in ["Mjukvaruintäkt (kr)","Hårdvaruintäkt (kr)","Total intäkt (kr)"]:
-    disp[c] = disp[c].apply(lambda x: f"{x:,.0f}".replace(","," ") + " kr")
-    st.dataframe(disp, use_container_width=True)
+        disp[c] = disp[c].apply(lambda x: f"{x:,.0f}".replace(","," ") + " kr")
+        st.dataframe(disp, use_container_width=True)
 
 # Diagram
 st.markdown("**Mjukvaruintäkt, Hårdvaruintäkt och Total intäkt (kr)**")
