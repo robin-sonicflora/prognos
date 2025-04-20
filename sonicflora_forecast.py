@@ -2,7 +2,23 @@ import streamlit as st
 import pandas as pd
 import io
 import zipfile
+import os
 import base64
+
+# Absolut sökväg till din uppladdade bild
+ICON_PATH = "/mnt/data/copy-icon.jpeg"
+
+# Fallback om bilden inte finns
+copy_icon_html = "📋"
+
+if os.path.exists(ICON_PATH):
+    with open(ICON_PATH, "rb") as img_file:
+        b64 = base64.b64encode(img_file.read()).decode("utf-8")
+    # Använd rätt MIME‐typ och storlek
+    copy_icon_html = (
+      f'<img src="data:image/jpeg;base64,{b64}" '
+      'style="width:16px;height:16px;vertical-align:middle;" />'
+    )
 
 # Läs in din JPEG‑ikon
 with open("copy-icon.svg", "rb") as img_file:
@@ -243,13 +259,13 @@ for _, r in total_by_year.iterrows():
             unit = "m²" if "yta" in c else "kr"
             disp = f"{v:,.0f}".replace(",", " ") + (f" {unit}" if unit=="m²" else " kr")
             if unit == "kr":
-                html_table += (
-                   f"<td>{disp}"
+    html_table += (
+    f"<td>{disp}"
     f"<button class='copy-btn' onclick=\"copyText('{int(v)}')\">"
-    f"{copy_icon_html}"
+      f"{copy_icon_html}"
     "</button>"
     "</td>"
-                )
+)
             else:
                 html_table += f"<td>{disp}</td>"
 
