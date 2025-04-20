@@ -134,7 +134,12 @@ for col in ["Mjukvaruintäkt (kr)","Hårdvaruintäkt (kr)","Total intäkt (kr)"]
     total_summary[col] = total_summary[col].map(lambda x: f"{int(x):,}".replace(","," ")+" kr")
 # totalsumma
 sums = {c: total_summary[c].str.replace("[^0-9]","",regex=True).astype(int).sum() for c in total_summary.columns if c!="År"}
-row = {"År":"Totalt"}
+    # Lägg till totalsumma-rad
+    row = {"År": "Totalt"}
+    row.update({
+        k: f"{v:,}".replace(",", " ") + (" m²" if "yta" in k else " kr")
+        for k, v in sums.items()
+    })
     # Lägg till formaterade värden i totalsummeringsraden
     row.update({
         k: f"{v:,}".replace(","," ") + (" m²" if "yta" in k else " kr")
