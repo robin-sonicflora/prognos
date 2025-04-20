@@ -123,7 +123,9 @@ st.dataframe(disp, use_container_width=True)
 
 # ---- Diagram ----
 st.markdown("**Mjukvaruintäkt, Hårdvaruintäkt och Total intäkt (kr)**")
-total_by_year = results_df.groupby("År")["Mjukvaruintäkt (kr)","Hårdvaruintäkt (kr)","Total intäkt (kr)"].sum().reset_index()
+total_by_year = results_df.groupby("År")[[
+    "Mjukvaruintäkt (kr)","Hårdvaruintäkt (kr)","Total intäkt (kr)"
+]].sum().reset_index()
 total_by_year["År"] = total_by_year["År"].astype(str)
 st.line_chart(total_by_year.set_index("År"))
 
@@ -135,12 +137,12 @@ for col in ["Mjukvaruintäkt (kr)","Hårdvaruintäkt (kr)","Total intäkt (kr)"]
 # totalsumma
 sums = {c: total_summary[c].str.replace("[^0-9]","",regex=True).astype(int).sum() for c in total_summary.columns if c!="År"}
     # Lägg till totalsumma-rad    row = {"År": "Totalt"}
-row.update({
+    row.update({
         k: f"{v:,}".replace(",", " ") + (" m²" if "yta" in k else " kr")
         for k, v in sums.items()
     })
-# Lägg till formaterade värden i totalsummeringsraden
-row.update({
+    # Lägg till formaterade värden i totalsummeringsraden
+    row.update({
         k: f"{v:,}".replace(","," ") + (" m²" if "yta" in k else " kr")
         for k, v in sums.items()
     })
