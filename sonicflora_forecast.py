@@ -153,7 +153,7 @@ if not results_df.empty:
 
     # Diagram
     st.markdown("**Mjukvaruintäkt, Hårdvaruintäkt och Total intäkt (kr)**")
-    total_by_year = results_df.groupby("År")["Mjukvaruintäkt (kr)", "Hårdvaruintäkt (kr)", "Total intäkt (kr)"].sum().reset_index()
+    total_by_year = results_df.groupby("År")[["Mjukvaruintäkt (kr)", "Hårdvaruintäkt (kr)", "Total intäkt (kr)"]].sum().reset_index()
     total_by_year["År"] = total_by_year["År"].astype(str)
     st.line_chart(data=total_by_year.set_index("År"))
 
