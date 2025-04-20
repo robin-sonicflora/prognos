@@ -218,12 +218,11 @@ for h in total_by_year.columns:
 html_table += f"<th>{h}</th>"
 html_table += "</tr></thead><tbody>"
 for _, r in total_by_year.iterrows():
-    html_table += "<tr>"
-    # Fetmarka totalsumman
-    if r["År"] == "Totalt":
-        html_table += "<tr style='font-weight:bold'>"
-    else:
-        html_table += "<tr>"
+# Fetmarka totalsumman
+if r["År"] == "Totalt":
+html_table += "<tr style='font-weight:bold'>"
+else:
+html_table += "<tr>"
 
 for c in total_by_year.columns:
 v = r[c]
@@ -231,15 +230,14 @@ if c == "År":
 html_table += f"<td>{v}</td>"
 else:
 unit = "m²" if "yta" in c else "kr"
-            disp = f"{v:,.0f}".replace(",", " ") + (f" {unit}" if unit=='m²' else " kr")
-            disp = f"{v:,.0f}".replace(",", " ") + (f" {unit}" if unit=="m²" else " kr")
+disp = f"{v:,.0f}".replace(",", " ") + (f" {unit}" if unit=="m²" else " kr")
 if unit == "kr":
-                html_table += f"<td>{disp}<button class='copy-btn' onclick=\"copyText('{int(v)}')\">📋</button></td>"
-                html_table += (
+html_table += (
                     f"<td>{disp}"
                     f"<button class='copy-btn' onclick=\"copyText('{int(v)}')\">📋</button>"
                     f"</td>"
-                )
+                   f"<td>{disp}"
+)
 else:
 html_table += f"<td>{disp}</td>"
 
