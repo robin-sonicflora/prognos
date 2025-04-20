@@ -142,7 +142,7 @@ row.update({
         for k, v in sums.items()
     })
     # Lägg till formaterade värden i totalsummeringsraden
-    row.update({
+row.update({
         k: f"{v:,}".replace(","," ") + (" m²" if "yta" in k else " kr")
         for k, v in sums.items()
     })
