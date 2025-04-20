@@ -135,7 +135,7 @@ for col in ["Mjukvaruintäkt (kr)","Hårdvaruintäkt (kr)","Total intäkt (kr)"]
 # totalsumma
 sums = {c: total_summary[c].str.replace("[^0-9]","",regex=True).astype(int).sum() for c in total_summary.columns if c!="År"}
     # Lägg till totalsumma-rad    row = {"År": "Totalt"}
-    row.update({
+row.update({
         k: f"{v:,}".replace(",", " ") + (" m²" if "yta" in k else " kr")
         for k, v in sums.items()
     })
