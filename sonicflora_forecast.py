@@ -252,12 +252,12 @@ components.html(html_table, height=600, scrolling=True)
 # Manuellt testscenario
 st.subheader("🧪 Testa ett scenario manuellt")
 col1, _ = st.columns([1,2])
-    with col1:
-test_area = st.number_input("Odlingsyta (m²)", value=45000)
-test_skord = st.number_input("Skörd (kg/m²)", value=42.2)
-test_pris = st.number_input("Pris (kr/kg)", value=12.42)
-test_okning = st.slider("Skördeökning (%) (test)", 0, 100, 20)
-test_andel = st.slider("SonicFloras andel av ökningen (%) (test)", 0, 100, 20)
+with col1:
+    test_area = st.number_input("Odlingsyta (m²)", value=45000)
+    test_skord = st.number_input("Skörd (kg/m²)", value=42.2)
+    test_pris = st.number_input("Pris (kr/kg)", value=12.42)
+    test_okning = st.slider("Skördeökning (%) (test)", 0, 100, 20)
+    test_andel = st.slider("SonicFloras andel av ökningen (%) (test)", 0, 100, 20)
 
 grundintakt = test_skord * test_pris
 okning_per_m2 = grundintakt * test_okning / 100
