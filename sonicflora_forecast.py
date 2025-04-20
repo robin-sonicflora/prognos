@@ -342,5 +342,3 @@ st.download_button(
     file_name="sonicflora_prognos_data.zip",
     mime="application/zip"
 )
-
-Såhär ser min kod ut för intäktsverktyget vi tidigare pratat om. Jag vill göra lite ändringar.
