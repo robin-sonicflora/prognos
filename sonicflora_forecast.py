@@ -2,6 +2,17 @@ import streamlit as st
 import pandas as pd
 import io
 import zipfile
+import base64
+
+# Läs in din JPEG‑ikon
+with open("copy-icon.jpeg", "rb") as img_file:
+    copy_icon_b64 = base64.b64encode(img_file.read()).decode()
+
+# Bygg ett litet <img>-element som ska injiceras i tabellen
+copy_icon_html = (
+    f'<img src="data:image/jpeg;base64,{copy_icon_b64}" '
+    'style="width:16px;height:16px;vertical-align:middle;" />'
+)
 
 # Sidan
 st.set_page_config(page_title="SonicFlora Intäktsprognos", layout="wide")
@@ -233,9 +244,11 @@ for _, r in total_by_year.iterrows():
             disp = f"{v:,.0f}".replace(",", " ") + (f" {unit}" if unit=="m²" else " kr")
             if unit == "kr":
                 html_table += (
-                    f"<td>{disp}"
-                    f"<button class='copy-btn' onclick=\"copyText('{int(v)}')\">📋</button>"
-                    f"</td>"
+                   f"<td>{disp}"
+    f"<button class='copy-btn' onclick=\"copyText('{int(v)}')\">"
+    f"{copy_icon_html}"
+    "</button>"
+    "</td>"
                 )
             else:
                 html_table += f"<td>{disp}</td>"
