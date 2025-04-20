@@ -196,9 +196,9 @@ wanted = [
 ]
 missing = set(wanted) - set(total_by_year.columns)
 if missing:
-st.error(f"Följande kolumner saknas i sammanställningen: {missing}")
-cols_to_show = [c for c in wanted if c in total_by_year.columns]
-total_by_year = total_by_year[cols_to_show]
+    st.error(f"Följande kolumner saknas i sammanställningen: {missing}")
+    cols_to_show = [c for c in wanted if c in total_by_year.columns]
+    total_by_year = total_by_year[cols_to_show]
 
 # 6) Rendera html-tabell med copy-knappar
 st.subheader("📘 Sammanställning per år")
