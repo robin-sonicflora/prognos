@@ -88,8 +88,8 @@ wide_growth = wide_growth.merge(
 input_df[["Land", "Startår"]], on="Land", how="left"
 )
 for idx, row in wide_growth.iterrows():
-for yr in year_cols:
-if int(yr) >= row["Startår"]:
+    for yr in year_cols:
+        if int(yr) >= row["Startår"]:
 wide_growth.at[idx, yr] = 10
 
 st.subheader("📈 Tillväxttakt per marknad och år")
