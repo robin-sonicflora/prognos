@@ -244,6 +244,7 @@ html_table = """
 for h in total_by_year.columns:
     html_table += f"<th>{h}</th>"
 html_table += "</tr></thead><tbody>"
+# Loop igenom rader och rendera
 for _, r in total_by_year.iterrows():
     # Fetmarka totalsumman
     if r["År"] == "Totalt":
@@ -257,20 +258,21 @@ for _, r in total_by_year.iterrows():
             html_table += f"<td>{v}</td>"
         else:
             unit = "m²" if "yta" in c else "kr"
-            disp = f"{v:,.0f}".replace(",", " ") + (f" {unit}" if unit=="m²" else " kr")
-        if unit == "kr":
-            html_table += (
-                f"<td>{disp}"
-                f"<button class='copy-btn' onclick=\"copyText('{int(v)}')\">"
-                  f"{copy_icon_html}"
-                "</button>"
-                "</td>"
-            )
+            disp = f"{v:,.0f}".replace(",", " ") + (f" {unit}" if unit == "m²" else " kr")
+            if unit == "kr":
+                html_table += (
+                    f"<td>{disp}"
+                    f"<button class='copy-btn' onclick=\"copyText('{int(v)}')\">"
+                    f"{copy_icon_html}"
+                    f"</button></td>"
+                )
             else:
                 html_table += f"<td>{disp}</td>"
 
     html_table += "</tr>"
+
 html_table += "</tbody></table>"
+
 import streamlit.components.v1 as components
 components.html(html_table, height=600, scrolling=True)
 
