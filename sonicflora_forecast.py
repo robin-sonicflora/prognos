@@ -233,7 +233,7 @@ for _, r in total_by_year.iterrows():
     html_table += "</tr>"
 html_table += "</tbody></table>"
 import streamlit.components.v1 as components
-components.html(html_table, height=600, scrolling=True)(html_table, height=600, scrolling=True)(html_table, height=600, scrolling=True)
+components.html(html_table, height=600, scrolling=True)
 
 # Manuellt testscenario
 st.subheader("🧪 Testa ett scenario manuellt")
