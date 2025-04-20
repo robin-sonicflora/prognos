@@ -214,7 +214,7 @@ html_table = """
  function copyText(val) { navigator.clipboard.writeText(val); }
 </script>
 <table class="custom-table"><thead><tr>"""
-    for h in total_by_year.columns:
+for h in total_by_year.columns:
     html_table += f"<th>{h}</th>"
     html_table += "</tr></thead><tbody>"
 for _, r in total_by_year.iterrows():
