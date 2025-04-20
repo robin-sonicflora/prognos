@@ -130,21 +130,24 @@ total_by_year["År"] = total_by_year["År"].astype(str)
 st.line_chart(total_by_year.set_index("År"))
 
 # ---- Sammanställning per år ----
-total_summary = total_by_year.copy()
-# Formatera Etablerad yta
+# Kopiera total_by_year och beräkna Etablerad yta per år
 etab_per_year = results_df.groupby("År")["Odlingsyta (m²)"].sum()
-total_summary = total_summary.copy()
-total_summary["Etablerad yta (m²)"] = etab_per_year.map(lambda x: f"{int(x):,}".replace(","," ")+" m²") (m²)"] = etabl_per_year.map(lambda x: f"{int(x):,}".replace(","," ")+" m²")
-
-# Formatera intäktskolumner
-total_summary = total_summary.copy()["Etablerad yta (m²)"] = etabl_per_year.map(lambda x: f"{int(x):,}".replace(","," ")+" m²")
+total_summary = total_by_year.copy()
+# Mappa Etablerad yta
+total_summary["Etablerad yta (m²)"] = total_summary["År"].map(
+    lambda y: f"{int(etab_per_year.get(int(y), 0)):,}".replace(","," ") + " m²"
+)
 # Formatera intäktskolumner
 for col in ["Mjukvaruintäkt (kr)", "Hårdvaruintäkt (kr)", "Total intäkt (kr)"]:
-    total_summary[col] = total_summary[col].map(lambda x: f"{int(x):,}".replace(","," ")+" kr")
-# Lägg till totalsummarad
+    total_summary[col] = total_summary[col].map(
+        lambda x: f"{int(x):,}".replace(","," ") + " kr"
+    )
+# Lägg till totalsumma-rad
 sums = {
-    col: results_df[col].sum() if col != "Etablerad yta (m²)" else results_df["Odlingsyta (m²)"].sum()
-    for col in ["Etablerad yta (m²)", "Mjukvaruintäkt (kr)", "Hårdvaruintäkt (kr)", "Total intäkt (kr)"]
+    "Etablerad yta (m²)": results_df["Odlingsyta (m²)"].sum(),
+    "Mjukvaruintäkt (kr)": results_df["Mjukvaruintäkt (kr)"].sum(),
+    "Hårdvaruintäkt (kr)": results_df["Hårdvaruintäkt (kr)"].sum(),
+    "Total intäkt (kr)": results_df["Total intäkt (kr)"].sum()
 }
 row = {"År": "Totalt"}
 row.update({
@@ -153,6 +156,5 @@ row.update({
 })
 total_summary = pd.concat([total_summary, pd.DataFrame([row])], ignore_index=True)
 
-# Visa sammanställning med Streamlit dataframe
 st.subheader("📘 Sammanställning per år")
 st.dataframe(total_summary, use_container_width=True)
