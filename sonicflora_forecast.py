@@ -121,23 +121,23 @@ for _, row in input_df.iterrows():
     rev_m2 = float(row["Intäkt för Sonicflora per m² (kr)"])
     current_area = area
 for year in years:
-if year >= start:
-gr = growth_long.loc[
-(growth_long["Land"]==land) &
-(growth_long["År"]==year),
-"Tillväxttakt (%/år)"
-].iloc[0] / 100
-soft_rev = current_area * rev_m2
-hard_units = (current_area / 45000) * hardware_units_per_45000
-hard_rev = hard_units * hardware_unit_price
-results.append({
-"År": year,
-"Land": land,
-"Odlingsyta (m²)": round(current_area),
-"Mjukvaruintäkt (kr)": round(soft_rev),
-"Hårdvaruintäkt (kr)": round(hard_rev),
-"Total intäkt (kr)": round(soft_rev + hard_rev)
-})
+    if year >= start:
+    gr = growth_long.loc[
+    (growth_long["Land"]==land) &
+    (growth_long["År"]==year),
+    "Tillväxttakt (%/år)"
+    ].iloc[0] / 100
+    soft_rev = current_area * rev_m2
+    hard_units = (current_area / 45000) * hardware_units_per_45000
+    hard_rev = hard_units * hardware_unit_price
+    results.append({
+    "År": year,
+    "Land": land,
+    "Odlingsyta (m²)": round(current_area),
+    "Mjukvaruintäkt (kr)": round(soft_rev),
+    "Hårdvaruintäkt (kr)": round(hard_rev),
+    "Total intäkt (kr)": round(soft_rev + hard_rev)
+    })
 current_area *= (1 + gr)
 
 results_df = pd.DataFrame(results)
