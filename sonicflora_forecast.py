@@ -131,18 +131,24 @@ st.line_chart(total_by_year.set_index("År"))
 
 # ---- Sammanställning per år ----
 total_summary = total_by_year.copy()
-total_summary["Etablerad yta (m²)"] = results_df.groupby("År")["Odlingsyta (m²)"].sum().map(lambda x: f"{int(x):,}".replace(","," ")+" m²")
-for col in ["Mjukvaruintäkt (kr)","Hårdvaruintäkt (kr)","Total intäkt (kr)"]:
+# Formatera Etablerad yta
+etab_per_year = results_df.groupby("År")["Odlingsyta (m²)"].sum()
+total_summary["Etablerad yta (m²)"] = etabl_per_year.map(lambda x: f"{int(x):,}".replace(","," ")+" m²")
+# Formatera intäktskolumner
+for col in ["Mjukvaruintäkt (kr)", "Hårdvaruintäkt (kr)", "Total intäkt (kr)"]:
     total_summary[col] = total_summary[col].map(lambda x: f"{int(x):,}".replace(","," ")+" kr")
-# totalsumma
-sums = {c: total_summary[c].str.replace("[^0-9]","",regex=True).astype(int).sum() for c in total_summary.columns if c!="År"}
-    # Lägg till totalsumma-rad    row = {"År": "Totalt"}
+# Lägg till totalsummarad
+sums = {
+    col: results_df[col].sum() if col != "Etablerad yta (m²)" else results_df["Odlingsyta (m²)"].sum()
+    for col in ["Etablerad yta (m²)", "Mjukvaruintäkt (kr)", "Hårdvaruintäkt (kr)", "Total intäkt (kr)"]
+}
+row = {"År": "Totalt"}
 row.update({
-        k: f"{v:,}".replace(",", " ") + (" m²" if "yta" in k else " kr")
-        for k, v in sums.items()
-    })
-    # Lägg till formaterade värden i totalsummeringsraden
-row.update({
-        k: f"{v:,}".replace(","," ") + (" m²" if "yta" in k else " kr")
-        for k, v in sums.items()
-    })
+    col: (f"{int(val):,}".replace(","," ") + (" m²" if "yta" in col else " kr"))
+    for col, val in sums.items()
+})
+total_summary = pd.concat([total_summary, pd.DataFrame([row])], ignore_index=True)
+
+# Visa sammanställning med Streamlit dataframe
+st.subheader("📘 Sammanställning per år")
+st.dataframe(total_summary, use_container_width=True)
