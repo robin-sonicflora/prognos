@@ -158,46 +158,82 @@ if not results_df.empty:
     st.line_chart(data=total_by_year.set_index("År"))
 
     # Sammanställning per år
-    sum_row = total_by_year.drop(columns=["År"]).sum(numeric_only=True).to_frame().T
-    sum_row.insert(0, "År", "Totalt")
-    total_by_year = pd.concat([total_by_year, sum_row], ignore_index=True)
-    # Säkra korrekt kolumnordning
-    total_by_year = total_by_year[["År", "Etablerad yta (m²)", "Mjukvaruintäkt (kr)", "Hårdvaruintäkt (kr)", "Total intäkt (kr)"]]
+# 1) Summera alla intäkter per år
+total_by_year = results_df.groupby("År")[
+    ["Mjukvaruintäkt (kr)", "Hårdvaruintäkt (kr)", "Total intäkt (kr)"]
+].sum().reset_index()
 
-    st.subheader("📘 Sammanställning per år")
-    # Bygg HTML-tabell
-    html_table = """
-    <style>
-      body, table, td, th { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; }
-      table.custom-table { width:100%; border-collapse:collapse; }
-      table.custom-table th, table.custom-table td { border:1px solid #ddd; padding:6px; text-align:left; }
-      table.custom-table th { background-color:#f5f5f5; }
-      button.copy-btn { background:none; border:none; cursor:pointer; font-size:12px; margin-left:8px; }
-    </style>
-    <script>
-      function copyText(val) { navigator.clipboard.writeText(val); }
-    </script>
-    <table class='custom-table'><thead><tr>"""
-    for h in total_by_year.columns:
-        html_table += f"<th>{h}</th>"
-    html_table += "</tr></thead><tbody>"
-    for _, r in total_by_year.iterrows():
-        html_table += "<tr>"
-        for c in total_by_year.columns:
-            v = r[c]
-            if c == "År":
-                html_table += f"<td>{v}</td>"
+# 2) Beräkna etablerad yta per år
+etab_df = (
+    results_df
+    .groupby("År")["Odlingsyta (m²)"]
+    .sum()
+    .reset_index()
+    .rename(columns={"Odlingsyta (m²)": "Etablerad yta (m²)"})
+)
+
+# 3) Slå ihop intäkter + yta
+total_by_year = total_by_year.merge(etab_df, on="År", how="left")
+
+# 4) Lägg till en totalsumma-rad
+sum_row = (
+    total_by_year
+    .drop(columns=["År"])  # ta bort år för sum
+    .sum(numeric_only=True)
+    .to_frame()
+    .T
+)
+sum_row.insert(0, "År", "Totalt")
+total_by_year = pd.concat([total_by_year, sum_row], ignore_index=True)
+
+# 5) Välj och ordna kolumner med kontroll
+wanted = [
+    "År",
+    "Etablerad yta (m²)",
+    "Mjukvaruintäkt (kr)",
+    "Hårdvaruintäkt (kr)",
+    "Total intäkt (kr)"
+]
+missing = set(wanted) - set(total_by_year.columns)
+if missing:
+    st.error(f"Följande kolumner saknas i sammanställningen: {missing}")
+cols_to_show = [c for c in wanted if c in total_by_year.columns]
+total_by_year = total_by_year[cols_to_show]
+
+# 6) Rendera html-tabell med copy-knappar
+st.subheader("📘 Sammanställning per år")
+html_table = """
+<style>
+  body, table, td, th { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; }
+  table.custom-table { width:100%; border-collapse:collapse; }
+  table.custom-table th, table.custom-table td { border:1px solid #ddd; padding:6px; text-align:left; }
+  table.custom-table th { background-color:#f5f5f5; }
+  button.copy-btn { background:none; border:none; cursor:pointer; font-size:12px; margin-left:8px; }
+</style>
+<script>
+  function copyText(val) { navigator.clipboard.writeText(val); }
+</script>
+<table class="custom-table"><thead><tr>"""
+for h in total_by_year.columns:
+    html_table += f"<th>{h}</th>"
+html_table += "</tr></thead><tbody>"
+for _, r in total_by_year.iterrows():
+    html_table += "<tr>"
+    for c in total_by_year.columns:
+        v = r[c]
+        if c == "År":
+            html_table += f"<td>{v}</td>"
+        else:
+            unit = "m²" if "yta" in c else "kr"
+            disp = f"{v:,.0f}".replace(",", " ") + (f" {unit}" if unit=='m²' else " kr")
+            if unit == "kr":
+                html_table += f"<td>{disp}<button class='copy-btn' onclick=\"copyText('{int(v)}')\">📋</button></td>"
             else:
-                unit = 'm²' if 'yta' in c else 'kr'
-                disp = f"{v:,.0f}".replace(","," ") + (f" {unit}" if unit=='m²' else " kr")
-                if unit=='kr':
-                    html_table += f"<td>{disp}<button class='copy-btn' onclick=\"copyText('{int(v)}')\">📋</button></td>"
-                else:
-                    html_table += f"<td>{disp}</td>"
-        html_table += "</tr>"
-    html_table += "</tbody></table>"
-    import streamlit.components.v1 as components
-    components.html(html_table, height=600, scrolling=True)(html_table, height=600, scrolling=True)
+                html_table += f"<td>{disp}</td>"
+    html_table += "</tr>"
+html_table += "</tbody></table>"
+import streamlit.components.v1 as components
+components.html(html_table, height=600, scrolling=True)(html_table, height=600, scrolling=True)(html_table, height=600, scrolling=True)
 
 # Manuellt testscenario
 st.subheader("🧪 Testa ett scenario manuellt")
