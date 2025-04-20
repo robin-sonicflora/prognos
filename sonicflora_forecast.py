@@ -5,7 +5,7 @@ import zipfile
 import base64
 
 # Läs in din JPEG‑ikon
-with open("/mnt/data/copy-icon.jpeg", "rb") as img_file:
+with open("copy-icon.jpeg", "rb") as img_file:
     copy_icon_b64 = base64.b64encode(img_file.read()).decode()
 
 # Bygg ett litet <img>-element som ska injiceras i tabellen
