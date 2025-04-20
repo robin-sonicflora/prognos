@@ -144,12 +144,12 @@ results_df = pd.DataFrame(results)
 
 # Visa resultat
 if not results_df.empty:
-st.subheader("📊 Resultat per marknad")
-display_cols = ["År","Land","Odlingsyta (m²)","Mjukvaruintäkt (kr)","Hårdvaruintäkt (kr)","Total intäkt (kr)"]
-disp = results_df[display_cols].copy()
-for c in ["Mjukvaruintäkt (kr)","Hårdvaruintäkt (kr)","Total intäkt (kr)"]:
-disp[c] = disp[c].apply(lambda x: f"{x:,.0f}".replace(","," ") + " kr")
-st.dataframe(disp, use_container_width=True)
+    st.subheader("📊 Resultat per marknad")
+    display_cols = ["År","Land","Odlingsyta (m²)","Mjukvaruintäkt (kr)","Hårdvaruintäkt (kr)","Total intäkt (kr)"]
+    disp = results_df[display_cols].copy()
+    for c in ["Mjukvaruintäkt (kr)","Hårdvaruintäkt (kr)","Total intäkt (kr)"]:
+    disp[c] = disp[c].apply(lambda x: f"{x:,.0f}".replace(","," ") + " kr")
+    st.dataframe(disp, use_container_width=True)
 
 # Diagram
 st.markdown("**Mjukvaruintäkt, Hårdvaruintäkt och Total intäkt (kr)**")
