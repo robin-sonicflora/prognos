@@ -88,8 +88,8 @@ wide_growth = wide_growth.merge(
 input_df[["Land", "Startår"]], on="Land", how="left"
 )
 for idx, row in wide_growth.iterrows():
-    for yr in year_cols:
-        if int(yr) >= row["Startår"]:
+for yr in year_cols:
+if int(yr) >= row["Startår"]:
 wide_growth.at[idx, yr] = 10
 
 st.subheader("📈 Tillväxttakt per marknad och år")
@@ -218,34 +218,22 @@ for h in total_by_year.columns:
 html_table += f"<th>{h}</th>"
 html_table += "</tr></thead><tbody>"
 for _, r in total_by_year.iterrows():
-    html_table += "<tr>"
-    # Fetmarka totalsumman
-    if r["År"] == "Totalt":
-        html_table += "<tr style='font-weight:bold'>"
-    else:
-        html_table += "<tr>"
-
+html_table += "<tr>"
 for c in total_by_year.columns:
 v = r[c]
 if c == "År":
 html_table += f"<td>{v}</td>"
 else:
 unit = "m²" if "yta" in c else "kr"
-            disp = f"{v:,.0f}".replace(",", " ") + (f" {unit}" if unit=='m²' else " kr")
-            disp = f"{v:,.0f}".replace(",", " ") + (f" {unit}" if unit=="m²" else " kr")
+disp = f"{v:,.0f}".replace(",", " ") + (f" {unit}" if unit=='m²' else " kr")
 if unit == "kr":
-                html_table += f"<td>{disp}<button class='copy-btn' onclick=\"copyText('{int(v)}')\">📋</button></td>"
-                html_table += (
-                    f"<td>{disp}"
-                    f"<button class='copy-btn' onclick=\"copyText('{int(v)}')\">📋</button>"
-                    f"</td>"
-                )
+html_table += f"<td>{disp}<button class='copy-btn' onclick=\"copyText('{int(v)}')\">📋</button></td>"
 else:
 html_table += f"<td>{disp}</td>"
-
 html_table += "</tr>"
 html_table += "</tbody></table>"
 import streamlit.components.v1 as components
+components.html(html_table, height=600, scrolling=True)(html_table, height=600, scrolling=True)(html_table, height=600, scrolling=True)
 components.html(html_table, height=600, scrolling=True)
 
 # Manuellt testscenario
