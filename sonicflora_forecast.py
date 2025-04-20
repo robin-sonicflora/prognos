@@ -219,7 +219,7 @@ for h in total_by_year.columns:
     html_table += "</tr></thead><tbody>"
     for _, r in total_by_year.iterrows():
 # Fetmarka totalsumman
-if r["År"] == "Totalt":
+    if r["År"] == "Totalt":
     html_table += "<tr style='font-weight:bold'>"
 else:
     html_table += "<tr>"
