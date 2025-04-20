@@ -157,11 +157,43 @@ if not results_df.empty:
     total_by_year["År"] = total_by_year["År"].astype(str)
     st.line_chart(data=total_by_year.set_index("År"))
 
-    # Sammanställning per år
+    # Sammanställning per år med HTML
     st.subheader("📘 Sammanställning per år")
-    html = ["<table>" ...]  # HTML-tabell-kod bibehålls från tidigare version
+    html_table = """
+    <style>
+      body, table, td, th { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; }
+      table.custom-table { width:100%; border-collapse:collapse; }
+      table.custom-table th, table.custom-table td { border:1px solid #ddd; padding:6px; text-align:left; }
+      table.custom-table th { background-color:#f5f5f5; }
+      button.copy-btn { background:none; border:none; cursor:pointer; font-size:12px; margin-left:8px; }
+    </style>
+    <script>
+      function copyText(val) { navigator.clipboard.writeText(val); }
+    </script>
+    <table class='custom-table'><thead><tr>"""
+    for h in total_by_year.columns:
+        html_table += f"<th>{h}</th>"
+    html_table += "</tr></thead><tbody>"
+    for _, r in total_by_year.iterrows():
+        html_table += "<tr>"
+        for c in total_by_year.columns:
+            v = r[c]
+            if c == "År":
+                html_table += f"<td>{v}</td>"
+            else:
+                if isinstance(v, (int, float)):
+                    unit = 'm²' if 'yta' in c else 'kr'
+                    disp = f"{v:,.0f}".replace(","," ") + (f" {unit}" if unit=='m²' else " kr")
+                    if unit=='kr':
+                        html_table += f"<td>{disp}<button class='copy-btn' onclick=\"copyText('{int(v)}')\">📋</button></td>"
+                    else:
+                        html_table += f"<td>{disp}</td>"
+                else:
+                    html_table += f"<td>{v}</td>"
+        html_table += "</tr>"
+    html_table += "</tbody></table>"
     import streamlit.components.v1 as components
-    components.html("".join(html), height=600, scrolling=True)
+    components.html(html_table, height=600, scrolling=True)
 
 # Manuellt testscenario
 st.subheader("🧪 Testa ett scenario manuellt")
@@ -194,6 +226,7 @@ with zipfile.ZipFile(zip_buffer, mode="w", compression=zipfile.ZIP_DEFLATED) as 
     zf.writestr("marknadsdata.csv", input_df.to_csv(index=False))
     zf.writestr("tillvaxt_per_ar.csv", growth_long.to_csv(index=False))
     zf.writestr("detaljer_per_ar.csv", results_df.to_csv(index=False))
+    zf.writestr("sum_per_ar.csv", total_by_year.to_csv(index=False))
 zip_buffer.seek(0)
 
 st.download_button(
