@@ -133,7 +133,8 @@ st.line_chart(total_by_year.set_index("År"))
 total_summary = total_by_year.copy()
 # Formatera Etablerad yta
 etab_per_year = results_df.groupby("År")["Odlingsyta (m²)"].sum()
-total_summary["Etablerad yta (m²)"] = etab_per_year.map(lambda x: f"{int(x):,}".replace(","," ")+" m²")
+total_summary = total_summary.copy()
+total_summary["Etablerad yta (m²)"] = etabl_per_year.map(lambda x: f"{int(x):,}".replace(","," ")+" m²")
 
 # Formatera intäktskolumner
 total_summary = total_summary.copy()["Etablerad yta (m²)"] = etabl_per_year.map(lambda x: f"{int(x):,}".replace(","," ")+" m²")
