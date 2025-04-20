@@ -258,7 +258,7 @@ for _, r in total_by_year.iterrows():
         else:
             unit = "m²" if "yta" in c else "kr"
             disp = f"{v:,.0f}".replace(",", " ") + (f" {unit}" if unit=="m²" else " kr")
-            if unit == "kr":
+        if unit == "kr":
 html_table += (
     f"<td>{disp}"
     f"<button class='copy-btn' onclick=\"copyText('{int(v)}')\">"
