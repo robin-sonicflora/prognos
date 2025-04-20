@@ -115,11 +115,11 @@ growth_long["Tillväxttakt (%/år)"].fillna(0, inplace=True)
 # Beräkningar per marknad och år
 results = []
 for _, row in input_df.iterrows():
-land = row["Land"]
-start = int(row["Startår"])
-area = float(row["Startyta (m²)"])
-rev_m2 = float(row["Intäkt för Sonicflora per m² (kr)"])
-current_area = area
+    land = row["Land"]
+    start = int(row["Startår"])
+    area = float(row["Startyta (m²)"])
+    rev_m2 = float(row["Intäkt för Sonicflora per m² (kr)"])
+    current_area = area
 for year in years:
 if year >= start:
 gr = growth_long.loc[
