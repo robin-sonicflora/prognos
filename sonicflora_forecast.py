@@ -165,9 +165,9 @@ if not results_df.empty:
     # Formatera och visa data...
     # (samma som tidigare, st.dataframe + aggregeringar + diagram)
 
-   results_df_formatted = results_df.copy()
-    for col in ["Mjukvaruintäkt (kr)", "Hårdvaruintäkt (kr)", "Total intäkt (kr)"]:
-        results_df_formatted[col] = results_df_formatted[col].apply(lambda x: f"{x:,.0f}".replace(",", " ") + " kr")
+results_df_formatted = results_df.copy()
+for col in ["Mjukvaruintäkt (kr)", "Hårdvaruintäkt (kr)", "Total intäkt (kr)"]:
+    results_df_formatted[col] = results_df_formatted[col].apply(lambda x: f"{x:,.0f}".replace(",", " ") + " kr")
 
     st.dataframe(results_df_formatted, use_container_width=True)
 
