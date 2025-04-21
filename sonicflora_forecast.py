@@ -160,51 +160,9 @@ import streamlit.components.v1 as components
 
 st.subheader("📘 Sammanställning per år")
 
-# CSS och tabellhuvud
-table_html = """
-<style>
-.table-container {
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    overflow: hidden;
-    font-family: sans-serif;
-    margin-top: 10px;
-}
-.table-header, .table-row {
-    display: flex;
-}
-.table-header {
-    background-color: #f0f0f0;
-    font-weight: bold;
-    border-bottom: 1px solid #ccc;
-}
-.table-cell {
-    flex: 1;
-    padding: 8px;
-    border-bottom: 1px solid #eee;
-    font-size: 14px;
-}
-.copy-btn {
-    margin-left: 8px;
-    font-size: 11px;
-    padding: 1px 6px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    background-color: white;
-    cursor: pointer;
-}
-</style>
-<div class="table-container">
-  <div class="table-header">
-    <div class="table-cell">År</div>
-    <div class="table-cell">Mjukvaruintäkt (kr)</div>
-    <div class="table-cell">Hårdvaruintäkt (kr)</div>
-    <div class="table-cell">Total intäkt (kr)</div>
-    <div class="table-cell">Etablerad yta (m²)</div>
-  </div>
-"""
+# Bygg tabellens innehåll (rader)
+rows_html = ""
 
-# Bygg raderna
 for i, row in total_summary.iterrows():
     year = row["År"]
     if year != "Totalt":
@@ -228,24 +186,61 @@ for i, row in total_summary.iterrows():
     ]
     raw_vals = [year, software, hardware, total, area]
 
-    row_html = '<div class="table-row">'
+    # En tabellrad
+    row_html = "<tr>"
     for j in range(len(display_vals)):
         val = display_vals[j]
         raw = raw_vals[j]
         if j == 0:
-            row_html += f'<div class="table-cell"><strong>{val}</strong></div>'
+            row_html += f"<td><strong>{val}</strong></td>"
         else:
-            row_html += f'''
-            <div class="table-cell">
-              {val}
-              <button class="copy-btn" onclick="navigator.clipboard.writeText('{raw}')">Kopiera</button>
-            </div>
-            '''
-    row_html += '</div>'
-    table_html += row_html
+            row_html += f"<td>{val} <button class='copy-btn' onclick=\"navigator.clipboard.writeText('{raw}')\">Kopiera</button></td>"
+    row_html += "</tr>"
+    rows_html += row_html
 
-# Avsluta HTML-tabellen
-table_html += '</div>'
+# HTML med stil + tabell
+html_code = f"""
+<style>
+    table {{
+        width: 100%;
+        border-collapse: collapse;
+        font-family: sans-serif;
+        font-size: 14px;
+    }}
+    thead {{
+        background-color: #f0f0f0;
+    }}
+    th, td {{
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }}
+    .copy-btn {{
+        margin-left: 8px;
+        font-size: 11px;
+        padding: 2px 6px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color: white;
+        cursor: pointer;
+    }}
+</style>
 
-# Visa i Streamlit
-st.markdown(table_html, unsafe_allow_html=True)
+<table>
+    <thead>
+        <tr>
+            <th>År</th>
+            <th>Mjukvaruintäkt (kr)</th>
+            <th>Hårdvaruintäkt (kr)</th>
+            <th>Total intäkt (kr)</th>
+            <th>Etablerad yta (m²)</th>
+        </tr>
+    </thead>
+    <tbody>
+        {rows_html}
+    </tbody>
+</table>
+"""
+
+# Rendera tabellen korrekt
+components.html(html_code, height=600, scrolling=True)
