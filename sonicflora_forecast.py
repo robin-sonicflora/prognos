@@ -282,7 +282,7 @@ function copyAndFlash(btn, text) {{
         btn.innerText = 'Kopierad';
         setTimeout(function() {{
             btn.classList.remove('copied');
-            btn.innerText = 'Kopiera;';
+            btn.innerText = 'Kopiera';
         }}, 1500);
     }});
 }}
