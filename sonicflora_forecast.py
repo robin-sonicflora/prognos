@@ -108,9 +108,9 @@ for _, row in input_df.iterrows():
                 "År":year,
                 "Land":land,
                 "Odlingsyta (m²)":round(cur),
-                "Mjukvaruintäkt (kr)":round(soft),
-                "Hårdvaruintäkt (kr)":round(hard),
-                "Total intäkt (kr)":round(soft+hard)
+                "Mjukvaruintäkt (kr)": soft,
+                "Hårdvaruintäkt (kr)": hard,
+                "Total intäkt (kr)": soft + hard
             })
             cur *= 1+gr
 results_df = pd.DataFrame(results)
