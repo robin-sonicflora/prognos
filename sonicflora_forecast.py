@@ -157,4 +157,53 @@ row.update({
 total_summary = pd.concat([total_summary, pd.DataFrame([row])], ignore_index=True)
 
 st.subheader("📘 Sammanställning per år")
-st.dataframe(total_summary, use_container_width=True)
+import streamlit.components.v1 as components
+
+st.subheader("📘 Sammanställning per år")
+
+# Rendera varje rad manuellt med kopiera-knapp
+for i, row in total_summary.iterrows():
+    if row["År"] == "Totalt":
+        st.markdown("---")  # Visuell separation för totalsumma
+
+    col1, col2, col3, col4, col5 = st.columns([2, 2, 2, 2, 2])
+
+    with col1:
+        st.markdown(f"**{row['År']}**")
+    with col2:
+        st.markdown(f"{row['Mjukvaruintäkt (kr)']}")
+    with col3:
+        st.markdown(f"{row['Hårdvaruintäkt (kr)']}")
+    with col4:
+        st.markdown(f"{row['Total intäkt (kr)']}")
+    with col5:
+        # Extrahera siffror (ofomaterade)
+        if row["År"] != "Totalt":
+            year = row["År"]
+            original_row = total_by_year[total_by_year["År"] == year].iloc[0]
+            software = int(original_row["Mjukvaruintäkt (kr)"])
+            hardware = int(original_row["Hårdvaruintäkt (kr)"])
+            total = int(original_row["Total intäkt (kr)"])
+            area = int(etab_per_year.get(int(year), 0))
+        else:
+            software = int(sums["Mjukvaruintäkt (kr)"])
+            hardware = int(sums["Hårdvaruintäkt (kr)"])
+            total = int(sums["Total intäkt (kr)"])
+            area = int(sums["Etablerad yta (m²)"])
+
+        copy_text = f"{software},{hardware},{total},{area}"
+        button_id = f"copy_button_{i}"
+
+        # Knapp med JavaScript för kopiering
+        components.html(f"""
+            <button onclick="navigator.clipboard.writeText('{copy_text}')" 
+                    style="
+                        padding: 4px 10px; 
+                        border: 1px solid #ccc; 
+                        border-radius: 6px; 
+                        background-color: white;
+                        cursor: pointer;
+                    ">
+                Kopiera
+            </button>
+        """, height=35)
