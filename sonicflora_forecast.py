@@ -156,21 +156,49 @@ row.update({
 })
 total_summary = pd.concat([total_summary, pd.DataFrame([row])], ignore_index=True)
 
-st.subheader("📘 Sammanställning per år")
 import streamlit.components.v1 as components
 
 st.subheader("📘 Sammanställning per år")
 
-# Rubrikrad
-header_cols = st.columns([1.2, 2, 2, 2, 2])
-headers = ["År", "Mjukvaruintäkt (kr)", "Hårdvaruintäkt (kr)", "Total intäkt (kr)", "Etablerad yta (m²)"]
-for col, header in zip(header_cols, headers):
-    col.markdown(f"**{header}**")
+# Rubrikrad med grå bakgrund
+header = """
+<style>
+.table-row {
+    display: flex;
+    border-bottom: 1px solid #ddd;
+    padding: 6px 0;
+}
+.table-cell {
+    flex: 1;
+    padding: 2px 8px;
+}
+.table-header {
+    font-weight: bold;
+    background-color: #f5f5f5;
+    border-top: 1px solid #ddd;
+}
+.copy-btn {
+    margin-left: 6px;
+    font-size: 10px;
+    padding: 1px 6px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background-color: white;
+    cursor: pointer;
+}
+</style>
+<div class="table-row table-header">
+  <div class="table-cell">År</div>
+  <div class="table-cell">Mjukvaruintäkt (kr)</div>
+  <div class="table-cell">Hårdvaruintäkt (kr)</div>
+  <div class="table-cell">Total intäkt (kr)</div>
+  <div class="table-cell">Etablerad yta (m²)</div>
+</div>
+"""
+st.markdown(header, unsafe_allow_html=True)
 
-# Datatabell med kopiera-knappar
+# Rad för rad i tabellen
 for i, row in total_summary.iterrows():
-    data_cols = st.columns([1.2, 2, 2, 2, 2])
-
     year = row["År"]
     if year != "Totalt":
         raw_row = total_by_year[total_by_year["År"] == year].iloc[0]
@@ -184,32 +212,5 @@ for i, row in total_summary.iterrows():
         total = int(sums["Total intäkt (kr)"])
         area = int(sums["Etablerad yta (m²)"])
 
-    # Kolumn 1: År
-    data_cols[0].markdown(f"**{year}**")
-
-    # Kolumn 2–5: Visad data + kopieraknapp
-    display_values = [
-        row["Mjukvaruintäkt (kr)"],
-        row["Hårdvaruintäkt (kr)"],
-        row["Total intäkt (kr)"],
-        row["Etablerad yta (m²)"]
-    ]
-    raw_values = [software, hardware, total, area]
-
-    for j in range(4):
-        with data_cols[j+1]:
-            st.markdown(f"{display_values[j]}")
-            components.html(f"""
-                <button onclick="navigator.clipboard.writeText('{raw_values[j]}')" 
-                        style="
-                            padding: 2px 6px; 
-                            font-size: 11px;
-                            border: 1px solid #ccc; 
-                            border-radius: 5px; 
-                            background-color: white;
-                            cursor: pointer;
-                            margin-top: -4px;
-                        ">
-                    Kopiera
-                </button>
-            """, height=30)
+    values = [
+        str(row["
