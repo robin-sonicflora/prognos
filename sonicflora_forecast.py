@@ -161,49 +161,55 @@ import streamlit.components.v1 as components
 
 st.subheader("📘 Sammanställning per år")
 
-# Rendera varje rad manuellt med kopiera-knapp
+# Rubrikrad
+header_cols = st.columns([1.2, 2, 2, 2, 2])
+headers = ["År", "Mjukvaruintäkt (kr)", "Hårdvaruintäkt (kr)", "Total intäkt (kr)", "Etablerad yta (m²)"]
+for col, header in zip(header_cols, headers):
+    col.markdown(f"**{header}**")
+
+# Datatabell med kopiera-knappar
 for i, row in total_summary.iterrows():
-    if row["År"] == "Totalt":
-        st.markdown("---")  # Visuell separation för totalsumma
+    data_cols = st.columns([1.2, 2, 2, 2, 2])
 
-    col1, col2, col3, col4, col5 = st.columns([2, 2, 2, 2, 2])
+    year = row["År"]
+    if year != "Totalt":
+        raw_row = total_by_year[total_by_year["År"] == year].iloc[0]
+        software = int(raw_row["Mjukvaruintäkt (kr)"])
+        hardware = int(raw_row["Hårdvaruintäkt (kr)"])
+        total = int(raw_row["Total intäkt (kr)"])
+        area = int(etab_per_year.get(int(year), 0))
+    else:
+        software = int(sums["Mjukvaruintäkt (kr)"])
+        hardware = int(sums["Hårdvaruintäkt (kr)"])
+        total = int(sums["Total intäkt (kr)"])
+        area = int(sums["Etablerad yta (m²)"])
 
-    with col1:
-        st.markdown(f"**{row['År']}**")
-    with col2:
-        st.markdown(f"{row['Mjukvaruintäkt (kr)']}")
-    with col3:
-        st.markdown(f"{row['Hårdvaruintäkt (kr)']}")
-    with col4:
-        st.markdown(f"{row['Total intäkt (kr)']}")
-    with col5:
-        # Extrahera siffror (ofomaterade)
-        if row["År"] != "Totalt":
-            year = row["År"]
-            original_row = total_by_year[total_by_year["År"] == year].iloc[0]
-            software = int(original_row["Mjukvaruintäkt (kr)"])
-            hardware = int(original_row["Hårdvaruintäkt (kr)"])
-            total = int(original_row["Total intäkt (kr)"])
-            area = int(etab_per_year.get(int(year), 0))
-        else:
-            software = int(sums["Mjukvaruintäkt (kr)"])
-            hardware = int(sums["Hårdvaruintäkt (kr)"])
-            total = int(sums["Total intäkt (kr)"])
-            area = int(sums["Etablerad yta (m²)"])
+    # Kolumn 1: År
+    data_cols[0].markdown(f"**{year}**")
 
-        copy_text = f"{software},{hardware},{total},{area}"
-        button_id = f"copy_button_{i}"
+    # Kolumn 2–5: Visad data + kopieraknapp
+    display_values = [
+        row["Mjukvaruintäkt (kr)"],
+        row["Hårdvaruintäkt (kr)"],
+        row["Total intäkt (kr)"],
+        row["Etablerad yta (m²)"]
+    ]
+    raw_values = [software, hardware, total, area]
 
-        # Knapp med JavaScript för kopiering
-        components.html(f"""
-            <button onclick="navigator.clipboard.writeText('{copy_text}')" 
-                    style="
-                        padding: 4px 10px; 
-                        border: 1px solid #ccc; 
-                        border-radius: 6px; 
-                        background-color: white;
-                        cursor: pointer;
-                    ">
-                Kopiera
-            </button>
-        """, height=35)
+    for j in range(4):
+        with data_cols[j+1]:
+            st.markdown(f"{display_values[j]}")
+            components.html(f"""
+                <button onclick="navigator.clipboard.writeText('{raw_values[j]}')" 
+                        style="
+                            padding: 2px 6px; 
+                            font-size: 11px;
+                            border: 1px solid #ccc; 
+                            border-radius: 5px; 
+                            background-color: white;
+                            cursor: pointer;
+                            margin-top: -4px;
+                        ">
+                    Kopiera
+                </button>
+            """, height=30)
