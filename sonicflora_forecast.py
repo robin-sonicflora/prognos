@@ -242,5 +242,103 @@ html_code = f"""
 </table>
 """
 
-# Rendera tabellen korrekt
+html_code = f"""
+<style>
+    table {{
+        width: 100%;
+        border-collapse: collapse;
+        font-family: sans-serif;
+        font-size: 14px;
+    }}
+    thead {{
+        background-color: #f0f0f0;
+    }}
+    th, td {{
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }}
+    .copy-btn {{
+        margin-left: 8px;
+        font-size: 11px;
+        padding: 2px 6px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color: white;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }}
+    .copy-btn.copied {{
+        background-color: #d4edda;
+        border-color: #28a745;
+        color: #155724;
+    }}
+</style>
+
+<script>
+function copyAndFlash(btn, text) {{
+    navigator.clipboard.writeText(text).then(function() {{
+        btn.classList.add('copied');
+        btn.innerText = '✅ Kopierat';
+        setTimeout(function() {{
+            btn.classList.remove('copied');
+            btn.innerText = 'Kopiera';
+        }}, 1500);
+    }});
+}}
+</script>
+
+<table>
+    <thead>
+        <tr>
+            <th>År</th>
+            <th>Mjukvaruintäkt (kr)</th>
+            <th>Hårdvaruintäkt (kr)</th>
+            <th>Total intäkt (kr)</th>
+            <th>Etablerad yta (m²)</th>
+        </tr>
+    </thead>
+    <tbody>
+"""
+
+# Lägg in raderna
+for i, row in total_summary.iterrows():
+    year = row["År"]
+    if year != "Totalt":
+        raw_row = total_by_year[total_by_year["År"] == year].iloc[0]
+        software = int(raw_row["Mjukvaruintäkt (kr)"])
+        hardware = int(raw_row["Hårdvaruintäkt (kr)"])
+        total = int(raw_row["Total intäkt (kr)"])
+        area = int(etab_per_year.get(int(year), 0))
+    else:
+        software = int(sums["Mjukvaruintäkt (kr)"])
+        hardware = int(sums["Hårdvaruintäkt (kr)"])
+        total = int(sums["Total intäkt (kr)"])
+        area = int(sums["Etablerad yta (m²)"])
+
+    display_vals = [
+        year,
+        row["Mjukvaruintäkt (kr)"],
+        row["Hårdvaruintäkt (kr)"],
+        row["Total intäkt (kr)"],
+        row["Etablerad yta (m²)"]
+    ]
+    raw_vals = [year, software, hardware, total, area]
+
+    html_code += "<tr>"
+    for j in range(len(display_vals)):
+        val = display_vals[j]
+        raw = raw_vals[j]
+        if j == 0:
+            html_code += f"<td><strong>{val}</strong></td>"
+        else:
+            html_code += f"<td>{val} <button class='copy-btn' onclick=\"copyAndFlash(this, '{raw}')\">Kopiera</button></td>"
+    html_code += "</tr>"
+
+html_code += """
+    </tbody>
+</table>
+"""
+
+# Rendera
 components.html(html_code, height=600, scrolling=True)
