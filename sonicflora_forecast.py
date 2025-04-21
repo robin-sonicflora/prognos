@@ -51,7 +51,7 @@ skord_data = st.data_editor(
 st.subheader("🌍 Marknadsdata")
 default_market = pd.DataFrame({
     "Land": skord_data["Land"],
-    "Startår": [2027, 2028, 2028, 2029, 2029, 2030, 2030, 2031, 2031, 2032, 2033, 2034, 2034],
+    "Startår": [2027, 2028, 2028, 2029, 2029, 2030, 2030, 2031, 2031, 2032, 2032, 2033, 2034],
     "Startyta (m²)": [45000]*len(skord_data),
     "Intäkt per m² (kr)": skord_data["Intäkt för Sonicflora per m² (kr)"].round(2)
 })
