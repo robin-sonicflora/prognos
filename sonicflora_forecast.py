@@ -160,17 +160,19 @@ import streamlit.components.v1 as components
 
 st.subheader("📘 Sammanställning per år")
 
-# Rubrikrad med grå bakgrund
-header = """
+# CSS för tabell
+table_style = """
 <style>
 .table-row {
     display: flex;
     border-bottom: 1px solid #ddd;
     padding: 6px 0;
+    align-items: center;
 }
 .table-cell {
     flex: 1;
     padding: 2px 8px;
+    font-size: 14px;
 }
 .table-header {
     font-weight: bold;
@@ -178,7 +180,7 @@ header = """
     border-top: 1px solid #ddd;
 }
 .copy-btn {
-    margin-left: 6px;
+    margin-left: 8px;
     font-size: 10px;
     padding: 1px 6px;
     border: 1px solid #ccc;
@@ -187,6 +189,10 @@ header = """
     cursor: pointer;
 }
 </style>
+"""
+
+# Tabellhuvud
+header_html = """
 <div class="table-row table-header">
   <div class="table-cell">År</div>
   <div class="table-cell">Mjukvaruintäkt (kr)</div>
@@ -195,9 +201,11 @@ header = """
   <div class="table-cell">Etablerad yta (m²)</div>
 </div>
 """
-st.markdown(header, unsafe_allow_html=True)
 
-# Rad för rad i tabellen
+# Kombinera stil och rubriker
+st.markdown(table_style + header_html, unsafe_allow_html=True)
+
+# Rendera rader
 for i, row in total_summary.iterrows():
     year = row["År"]
     if year != "Totalt":
@@ -213,4 +221,25 @@ for i, row in total_summary.iterrows():
         area = int(sums["Etablerad yta (m²)"])
 
     values = [
-        str(row["
+        year,
+        row["Mjukvaruintäkt (kr)"],
+        row["Hårdvaruintäkt (kr)"],
+        row["Total intäkt (kr)"],
+        row["Etablerad yta (m²)"]
+    ]
+    raw_values = [year, software, hardware, total, area]
+
+    # HTML-rad
+    html_row = '<div class="table-row">'
+    for j, val in enumerate(values):
+        if j == 0:
+            html_row += f'<div class="table-cell"><strong>{val}</strong></div>'
+        else:
+            html_row += f'''
+            <div class="table-cell">
+              {val}
+              <button class="copy-btn" onclick="navigator.clipboard.writeText('{raw_values[j]}')">Kopiera</button>
+            </div>
+            '''
+    html_row += '</div>'
+    st.markdown(html_row, unsafe_allow_html=True)
