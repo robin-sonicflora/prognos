@@ -279,10 +279,10 @@ html_code = f"""
 function copyAndFlash(btn, text) {{
     navigator.clipboard.writeText(text).then(function() {{
         btn.classList.add('copied');
-        btn.innerText = 'Kopierat!';
+        btn.innerText = 'Kopierad';
         setTimeout(function() {{
             btn.classList.remove('copied');
-            btn.innerText = 'Kopiera';
+            btn.innerText = 'Kopiera ';
         }}, 1500);
     }});
 }}
