@@ -160,28 +160,33 @@ import streamlit.components.v1 as components
 
 st.subheader("📘 Sammanställning per år")
 
-# CSS för tabell
-table_style = """
+# CSS och tabellhuvud
+table_html = """
 <style>
-.table-row {
+.table-container {
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    overflow: hidden;
+    font-family: sans-serif;
+    margin-top: 10px;
+}
+.table-header, .table-row {
     display: flex;
-    border-bottom: 1px solid #ddd;
-    padding: 6px 0;
-    align-items: center;
+}
+.table-header {
+    background-color: #f0f0f0;
+    font-weight: bold;
+    border-bottom: 1px solid #ccc;
 }
 .table-cell {
     flex: 1;
-    padding: 2px 8px;
+    padding: 8px;
+    border-bottom: 1px solid #eee;
     font-size: 14px;
-}
-.table-header {
-    font-weight: bold;
-    background-color: #f5f5f5;
-    border-top: 1px solid #ddd;
 }
 .copy-btn {
     margin-left: 8px;
-    font-size: 10px;
+    font-size: 11px;
     padding: 1px 6px;
     border: 1px solid #ccc;
     border-radius: 6px;
@@ -189,23 +194,17 @@ table_style = """
     cursor: pointer;
 }
 </style>
+<div class="table-container">
+  <div class="table-header">
+    <div class="table-cell">År</div>
+    <div class="table-cell">Mjukvaruintäkt (kr)</div>
+    <div class="table-cell">Hårdvaruintäkt (kr)</div>
+    <div class="table-cell">Total intäkt (kr)</div>
+    <div class="table-cell">Etablerad yta (m²)</div>
+  </div>
 """
 
-# Tabellhuvud
-header_html = """
-<div class="table-row table-header">
-  <div class="table-cell">År</div>
-  <div class="table-cell">Mjukvaruintäkt (kr)</div>
-  <div class="table-cell">Hårdvaruintäkt (kr)</div>
-  <div class="table-cell">Total intäkt (kr)</div>
-  <div class="table-cell">Etablerad yta (m²)</div>
-</div>
-"""
-
-# Kombinera stil och rubriker
-st.markdown(table_style + header_html, unsafe_allow_html=True)
-
-# Rendera rader
+# Bygg raderna
 for i, row in total_summary.iterrows():
     year = row["År"]
     if year != "Totalt":
@@ -220,26 +219,33 @@ for i, row in total_summary.iterrows():
         total = int(sums["Total intäkt (kr)"])
         area = int(sums["Etablerad yta (m²)"])
 
-    values = [
+    display_vals = [
         year,
         row["Mjukvaruintäkt (kr)"],
         row["Hårdvaruintäkt (kr)"],
         row["Total intäkt (kr)"],
         row["Etablerad yta (m²)"]
     ]
-    raw_values = [year, software, hardware, total, area]
+    raw_vals = [year, software, hardware, total, area]
 
-    # HTML-rad
-    html_row = '<div class="table-row">'
-    for j, val in enumerate(values):
+    row_html = '<div class="table-row">'
+    for j in range(len(display_vals)):
+        val = display_vals[j]
+        raw = raw_vals[j]
         if j == 0:
-            html_row += f'<div class="table-cell"><strong>{val}</strong></div>'
+            row_html += f'<div class="table-cell"><strong>{val}</strong></div>'
         else:
-            html_row += f'''
+            row_html += f'''
             <div class="table-cell">
               {val}
-              <button class="copy-btn" onclick="navigator.clipboard.writeText('{raw_values[j]}')">Kopiera</button>
+              <button class="copy-btn" onclick="navigator.clipboard.writeText('{raw}')">Kopiera</button>
             </div>
             '''
-    html_row += '</div>'
-    st.markdown(html_row, unsafe_allow_html=True)
+    row_html += '</div>'
+    table_html += row_html
+
+# Avsluta HTML-tabellen
+table_html += '</div>'
+
+# Visa i Streamlit
+st.markdown(table_html, unsafe_allow_html=True)
