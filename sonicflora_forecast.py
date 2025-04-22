@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import io
 import zipfile
+import streamlit.components.v1 as components
 
 # ---- Page config ----
 st.set_page_config(page_title="SonicFlora Intäktsprognos", layout="wide")
@@ -35,7 +36,7 @@ skord_data["Intäkt för Sonicflora per m² (kr)"] = (
     skord_data["Grundintäkt (kr/m²)"] * skordeokning/100 * andel_sonicflora/100
 )
 
-st.subheader("📐 Uträkning av intäkt per m²")
+st.subheader("🖐️ Uträkning av intäkt per m²")
 skord_data = st.data_editor(
     skord_data, use_container_width=True,
     column_config={
@@ -103,90 +104,77 @@ for _, row in input_df.iterrows():
         if year >= start:
             gr = growth_long.query("Land == @land and År == @year")["Tillväxttakt (%/år)"].iloc[0]/100
             soft = cur * rev_m2
-            hard = (cur/45000)*hardware_units_per_45000*hardware_unit_price
+            hw_units = (cur / 45000) * hardware_units_per_45000
+            hard = hw_units * hardware_unit_price
             results.append({
-                "År":year,
-                "Land":land,
-                "Odlingsyta (m²)":round(cur),
+                "År": year,
+                "Land": land,
+                "Odlingsyta (m²)": round(cur),
                 "Mjukvaruintäkt (kr)": soft,
                 "Hårdvaruintäkt (kr)": hard,
-                "Total intäkt (kr)": soft + hard
+                "Total intäkt (kr)": soft + hard,
+                "Hårdvaruenheter (st)": round(hw_units)
             })
-            cur *= 1+gr
+            cur *= 1 + gr
 results_df = pd.DataFrame(results)
 
 # ---- Resultat per marknad ----
 st.subheader("📊 Resultat per marknad")
 disp = results_df.copy()
 disp[["Mjukvaruintäkt (kr)","Hårdvaruintäkt (kr)","Total intäkt (kr)"]] = disp[["Mjukvaruintäkt (kr)","Hårdvaruintäkt (kr)","Total intäkt (kr)"]].applymap(lambda x: f"{x:,.0f}".replace(","," ")+" kr")
+disp["Hårdvaruenheter (st)"] = results_df["Hårdvaruenheter (st)"]
 st.dataframe(disp, use_container_width=True)
 
 # ---- Diagram ----
 st.markdown("**Mjukvaruintäkt, Hårdvaruintäkt och Total intäkt (kr)**")
-total_by_year = results_df.groupby("År")[[
-    "Mjukvaruintäkt (kr)","Hårdvaruintäkt (kr)","Total intäkt (kr)"
-]].sum().reset_index()
+total_by_year = results_df.groupby("År")[["Mjukvaruintäkt (kr)","Hårdvaruintäkt (kr)","Total intäkt (kr)"]].sum().reset_index()
 total_by_year["År"] = total_by_year["År"].astype(str)
 st.line_chart(total_by_year.set_index("År"))
 
 # ---- Sammanställning per år ----
-# Kopiera total_by_year och beräkna Etablerad yta per år
 etab_per_year = results_df.groupby("År")["Odlingsyta (m²)"].sum()
+hw_units_per_year = results_df.groupby("År")["Hårdvaruenheter (st)"].sum()
 total_summary = total_by_year.copy()
-# Mappa Etablerad yta
-total_summary["Etablerad yta (m²)"] = total_summary["År"].map(
-    lambda y: f"{int(etab_per_year.get(int(y), 0)):,}".replace(","," ") + " m²"
-)
-# Formatera intäktskolumner
+total_summary["Etablerad yta (m²)"] = total_summary["År"].map(lambda y: f"{int(etab_per_year.get(int(y), 0)):,}".replace(","," ") + " m²")
+total_summary["Hårdvaruenheter (st)"] = total_summary["År"].map(lambda y: f"{int(hw_units_per_year.get(int(y), 0)):,}".replace(","," ") + " st")
 for col in ["Mjukvaruintäkt (kr)", "Hårdvaruintäkt (kr)", "Total intäkt (kr)"]:
-    total_summary[col] = total_summary[col].map(
-        lambda x: f"{int(x):,}".replace(","," ") + " kr"
-    )
-# Lägg till totalsumma-rad
+    total_summary[col] = total_summary[col].map(lambda x: f"{int(x):,}".replace(",", " ") + " kr")
 sums = {
     "Etablerad yta (m²)": results_df["Odlingsyta (m²)"].sum(),
     "Mjukvaruintäkt (kr)": results_df["Mjukvaruintäkt (kr)"].sum(),
     "Hårdvaruintäkt (kr)": results_df["Hårdvaruintäkt (kr)"].sum(),
-    "Total intäkt (kr)": results_df["Total intäkt (kr)"].sum()
+    "Total intäkt (kr)": results_df["Total intäkt (kr)"].sum(),
+    "Hårdvaruenheter (st)": results_df["Hårdvaruenheter (st)"].sum()
 }
 row = {"År": "Totalt"}
 row.update({
-    col: (f"{int(val):,}".replace(","," ") + (" m²" if "yta" in col else " kr"))
+    col: (f"{int(val):,}".replace(",", " ") + (" m²" if "yta" in col else (" st" if "enheter" in col else " kr")))
     for col, val in sums.items()
 })
 total_summary = pd.concat([total_summary, pd.DataFrame([row])], ignore_index=True)
 
-import streamlit.components.v1 as components
-
+# ---- Visa sammanställning som tabell med kopiera-knappar ----
 st.subheader("📘 Sammanställning per år")
 
-# Bygg tabellens innehåll (rader)
 rows_html = ""
-
 for i, row in total_summary.iterrows():
     year = row["År"]
-    if year != "Totalt":
-        raw_row = total_by_year[total_by_year["År"] == year].iloc[0]
-        software = int(raw_row["Mjukvaruintäkt (kr)"])
-        hardware = int(raw_row["Hårdvaruintäkt (kr)"])
-        total = int(raw_row["Total intäkt (kr)"])
-        area = int(etab_per_year.get(int(year), 0))
-    else:
-        software = int(sums["Mjukvaruintäkt (kr)"])
-        hardware = int(sums["Hårdvaruintäkt (kr)"])
-        total = int(sums["Total intäkt (kr)"])
-        area = int(sums["Etablerad yta (m²)"])
-
     display_vals = [
-        year,
+        row["År"],
         row["Mjukvaruintäkt (kr)"],
         row["Hårdvaruintäkt (kr)"],
         row["Total intäkt (kr)"],
-        row["Etablerad yta (m²)"]
+        row["Etablerad yta (m²)"],
+        row["Hårdvaruenheter (st)"]
     ]
-    raw_vals = [year, software, hardware, total, area]
-
-    # En tabellrad
+    raw_vals = [
+        year,
+        sums["Mjukvaruintäkt (kr)"] if year == "Totalt" else int(results_df[results_df["År"] == int(year)]["Mjukvaruintäkt (kr)"].sum()),
+        sums["Hårdvaruintäkt (kr)"] if year == "Totalt" else int(results_df[results_df["År"] == int(year)]["Hårdvaruintäkt (kr)"].sum()),
+        sums["Total intäkt (kr)"] if year == "Totalt" else int(results_df[results_df["År"] == int(year)]["Total intäkt (kr)"].sum()),
+        sums["Etablerad yta (m²)"] if year == "Totalt" else int(etab_per_year.get(int(year), 0)),
+        sums["Hårdvaruenheter (st)"] if year == "Totalt" else int(hw_units_per_year.get(int(year), 0))
+    ]
     row_html = "<tr>"
     for j in range(len(display_vals)):
         val = display_vals[j]
@@ -198,34 +186,13 @@ for i, row in total_summary.iterrows():
     row_html += "</tr>"
     rows_html += row_html
 
-# HTML med stil + tabell
 html_code = f"""
 <style>
-    table {{
-        width: 100%;
-        border-collapse: collapse;
-        font-family: sans-serif;
-        font-size: 14px;
-    }}
-    thead {{
-        background-color: #f0f0f0;
-    }}
-    th, td {{
-        border: 1px solid #ddd;
-        padding: 8px;
-        text-align: left;
-    }}
-    .copy-btn {{
-        margin-left: 8px;
-        font-size: 11px;
-        padding: 2px 6px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        background-color: white;
-        cursor: pointer;
-    }}
+    table {{ width: 100%; border-collapse: collapse; font-family: sans-serif; font-size: 14px; }}
+    thead {{ background-color: #f0f0f0; }}
+    th, td {{ border: 1px solid #ddd; padding: 8px; text-align: left; }}
+    .copy-btn {{ margin-left: 8px; font-size: 11px; padding: 2px 6px; border: 1px solid #ccc; border-radius: 5px; background-color: white; cursor: pointer; }}
 </style>
-
 <table>
     <thead>
         <tr>
@@ -234,6 +201,7 @@ html_code = f"""
             <th>Hårdvaruintäkt (kr)</th>
             <th>Total intäkt (kr)</th>
             <th>Etablerad yta (m²)</th>
+            <th>Hårdvaruenheter (st)</th>
         </tr>
     </thead>
     <tbody>
@@ -241,104 +209,4 @@ html_code = f"""
     </tbody>
 </table>
 """
-
-html_code = f"""
-<style>
-    table {{
-        width: 100%;
-        border-collapse: collapse;
-        font-family: sans-serif;
-        font-size: 14px;
-    }}
-    thead {{
-        background-color: #f0f0f0;
-    }}
-    th, td {{
-        border: 1px solid #ddd;
-        padding: 8px;
-        text-align: left;
-    }}
-    .copy-btn {{
-        margin-left: 8px;
-        font-size: 11px;
-        padding: 2px 6px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        background-color: white;
-        cursor: pointer;
-        transition: all 0.2s ease;
-    }}
-    .copy-btn.copied {{
-        background-color: #d4edda;
-        border-color: #28a745;
-        color: #155724;
-    }}
-</style>
-
-<script>
-function copyAndFlash(btn, text) {{
-    navigator.clipboard.writeText(text).then(function() {{
-        btn.classList.add('copied');
-        btn.innerText = 'Kopierad';
-        setTimeout(function() {{
-            btn.classList.remove('copied');
-            btn.innerText = 'Kopiera';
-        }}, 2500);
-    }});
-}}
-</script>
-
-<table>
-    <thead>
-        <tr>
-            <th>År</th>
-            <th>Mjukvaruintäkt (kr)</th>
-            <th>Hårdvaruintäkt (kr)</th>
-            <th>Total intäkt (kr)</th>
-            <th>Etablerad yta (m²)</th>
-        </tr>
-    </thead>
-    <tbody>
-"""
-
-# Lägg in raderna
-for i, row in total_summary.iterrows():
-    year = row["År"]
-    if year != "Totalt":
-        raw_row = total_by_year[total_by_year["År"] == year].iloc[0]
-        software = int(raw_row["Mjukvaruintäkt (kr)"])
-        hardware = int(raw_row["Hårdvaruintäkt (kr)"])
-        total = int(raw_row["Total intäkt (kr)"])
-        area = int(etab_per_year.get(int(year), 0))
-    else:
-        software = int(sums["Mjukvaruintäkt (kr)"])
-        hardware = int(sums["Hårdvaruintäkt (kr)"])
-        total = int(sums["Total intäkt (kr)"])
-        area = int(sums["Etablerad yta (m²)"])
-
-    display_vals = [
-        year,
-        row["Mjukvaruintäkt (kr)"],
-        row["Hårdvaruintäkt (kr)"],
-        row["Total intäkt (kr)"],
-        row["Etablerad yta (m²)"]
-    ]
-    raw_vals = [year, software, hardware, total, area]
-
-    html_code += "<tr>"
-    for j in range(len(display_vals)):
-        val = display_vals[j]
-        raw = raw_vals[j]
-        if j == 0:
-            html_code += f"<td><strong>{val}</strong></td>"
-        else:
-            html_code += f"<td>{val} <button class='copy-btn' onclick=\"copyAndFlash(this, '{raw}')\">Kopiera</button></td>"
-    html_code += "</tr>"
-
-html_code += """
-    </tbody>
-</table>
-"""
-
-# Rendera
 components.html(html_code, height=600, scrolling=True)
