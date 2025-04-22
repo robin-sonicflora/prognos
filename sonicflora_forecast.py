@@ -120,7 +120,7 @@ results_df = pd.DataFrame(results)
 st.subheader("📊 Resultat per marknad")
 disp = results_df.copy()
 disp[["Mjukvaruintäkt (kr)","Hårdvaruintäkt (kr)","Total intäkt (kr)"]] = disp[["Mjukvaruintäkt (kr)","Hårdvaruintäkt (kr)","Total intäkt (kr)"]].applymap(lambda x: f"{x:,.0f}".replace(","," ")+" kr")
-disp["Hårdvaruenheter (st)"] = results_df["Hårdvaruenheter (st)"]
+disp["Hårdvaruenheter (st)"] = results_df["Nyförsäljning av hårdvaruenheter (st)"]
 st.dataframe(disp, use_container_width=True)
 
 # ---- Diagram ----
@@ -142,7 +142,7 @@ sums = {
     "Mjukvaruintäkt (kr)": results_df["Mjukvaruintäkt (kr)"].sum(),
     "Hårdvaruintäkt (kr)": results_df["Hårdvaruintäkt (kr)"].sum(),
     "Total intäkt (kr)": results_df["Total intäkt (kr)"].sum(),
-    "Hårdvaruenheter (st)": results_df["Hårdvaruenheter (st)"].sum()
+    "Nyförsäljning av hårdvaruenheter (st)": results_df["Hårdvaruenheter (st)"].sum()
 }
 row = {"År": "Totalt"}
 row.update({
