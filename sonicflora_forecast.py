@@ -1,7 +1,5 @@
 import streamlit as st
 import pandas as pd
-import io
-import zipfile
 import streamlit.components.v1 as components
 
 # ---- Page config ----
@@ -36,7 +34,7 @@ skord_data["Intäkt för Sonicflora per m² (kr)"] = (
     skord_data["Grundintäkt (kr/m²)"] * skordeokning/100 * andel_sonicflora/100
 )
 
-st.subheader("🖐️ Uträkning av intäkt per m²")
+st.subheader("📐 Uträkning av intäkt per m²")
 skord_data = st.data_editor(
     skord_data, use_container_width=True,
     column_config={
@@ -153,45 +151,15 @@ row.update({
 })
 total_summary = pd.concat([total_summary, pd.DataFrame([row])], ignore_index=True)
 
-# ---- Visa sammanställning som tabell med kopiera-knappar ----
+# ---- HTML-renderad tabell ----
 st.subheader("📘 Sammanställning per år")
 
-rows_html = ""
-for i, row in total_summary.iterrows():
-    year = row["År"]
-    display_vals = [
-        row["År"],
-        row["Mjukvaruintäkt (kr)"],
-        row["Hårdvaruintäkt (kr)"],
-        row["Total intäkt (kr)"],
-        row["Etablerad yta (m²)"],
-        row["Hårdvaruenheter (st)"]
-    ]
-    raw_vals = [
-        year,
-        sums["Mjukvaruintäkt (kr)"] if year == "Totalt" else int(results_df[results_df["År"] == int(year)]["Mjukvaruintäkt (kr)"].sum()),
-        sums["Hårdvaruintäkt (kr)"] if year == "Totalt" else int(results_df[results_df["År"] == int(year)]["Hårdvaruintäkt (kr)"].sum()),
-        sums["Total intäkt (kr)"] if year == "Totalt" else int(results_df[results_df["År"] == int(year)]["Total intäkt (kr)"].sum()),
-        sums["Etablerad yta (m²)"] if year == "Totalt" else int(etab_per_year.get(int(year), 0)),
-        sums["Hårdvaruenheter (st)"] if year == "Totalt" else int(hw_units_per_year.get(int(year), 0))
-    ]
-    row_html = "<tr>"
-    for j in range(len(display_vals)):
-        val = display_vals[j]
-        raw = raw_vals[j]
-        if j == 0:
-            row_html += f"<td><strong>{val}</strong></td>"
-        else:
-            row_html += f"<td>{val} <button class='copy-btn' onclick=\"navigator.clipboard.writeText('{raw}')\">Kopiera</button></td>"
-    row_html += "</tr>"
-    rows_html += row_html
-
-html_code = f"""
+html_code = """
 <style>
-    table {{ width: 100%; border-collapse: collapse; font-family: sans-serif; font-size: 14px; }}
-    thead {{ background-color: #f0f0f0; }}
-    th, td {{ border: 1px solid #ddd; padding: 8px; text-align: left; }}
-    .copy-btn {{ margin-left: 8px; font-size: 11px; padding: 2px 6px; border: 1px solid #ccc; border-radius: 5px; background-color: white; cursor: pointer; }}
+    table { width: 100%; border-collapse: collapse; font-family: sans-serif; font-size: 14px; }
+    thead { background-color: #f0f0f0; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    .copy-btn { margin-left: 8px; font-size: 11px; padding: 2px 6px; border: 1px solid #ccc; border-radius: 5px; background-color: white; cursor: pointer; }
 </style>
 <table>
     <thead>
@@ -205,7 +173,14 @@ html_code = f"""
         </tr>
     </thead>
     <tbody>
-        {rows_html}
+"""
+for i, row in total_summary.iterrows():
+    html_code += f"<tr><td><strong>{row['År']}</strong></td>"
+    for col in ["Mjukvaruintäkt (kr)", "Hårdvaruintäkt (kr)", "Total intäkt (kr)", "Etablerad yta (m²)", "Hårdvaruenheter (st)"]:
+        raw_val = row[col].split(" ")[0].replace(" ", "")
+        html_code += f"<td>{row[col]} <button class='copy-btn' onclick=\"navigator.clipboard.writeText('{raw_val}')\">Kopiera</button></td>"
+    html_code += "</tr>"
+html_code += """
     </tbody>
 </table>
 """
