@@ -120,7 +120,7 @@ results_df = pd.DataFrame(results)
 st.subheader("📊 Resultat per marknad")
 disp = results_df.copy()
 disp[["Mjukvaruintäkt (kr)","Hårdvaruintäkt (kr)","Total intäkt (kr)"]] = disp[["Mjukvaruintäkt (kr)","Hårdvaruintäkt (kr)","Total intäkt (kr)"]].applymap(lambda x: f"{x:,.0f}".replace(","," ")+" kr")
-disp["Hårdvaruenheter (st)"] = results_df["Hårdvaruenheter (st)"]
+disp["Nyförsäljning hårdvaruenheter (st)"] = results_df["Nyförsäljning hårdvaruenheter (st)"]
 st.dataframe(disp, use_container_width=True)
 
 # ---- Diagram ----
@@ -165,7 +165,7 @@ for _, row in total_summary.iterrows():
     if row["År"] == "Totalt":
         continue  # Skippa totalraden
     html_code += f"<tr><td><strong>{row['År']}</strong></td>"
-    for col in ["Mjukvaruintäkt (kr)", "Hårdvaruintäkt (kr)", "Total intäkt (kr)", "Etablerad yta (m²)", "Hårdvaruenheter (st)"]:
+    for col in ["Mjukvaruintäkt (kr)", "Hårdvaruintäkt (kr)", "Total intäkt (kr)", "Etablerad yta (m²)", "Nyförsäljning hårdvaruenheter (st)"]:
         raw_val = row[col].split(" ")[0].replace(" ", "")
         html_code += f"<td>{row[col]} <button class='copy-btn' onclick=\"navigator.clipboard.writeText('{raw_val}')\">Kopiera</button></td>"
     html_code += "</tr>"
