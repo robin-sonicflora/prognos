@@ -111,7 +111,7 @@ for _, row in input_df.iterrows():
                 "Mjukvaruintäkt (kr)": soft,
                 "Hårdvaruintäkt (kr)": hard,
                 "Total intäkt (kr)": soft + hard,
-                "Hårdvaruenheter (st)": round(hw_units)
+                "Nyförsäljning hårdvaruenheter (st)": round(hw_units)
             })
             cur *= 1 + gr
 results_df = pd.DataFrame(results)
@@ -131,10 +131,10 @@ st.line_chart(total_by_year.set_index("År"))
 
 # ---- Sammanställning per år ----
 etab_per_year = results_df.groupby("År")["Odlingsyta (m²)"].sum()
-hw_units_per_year = results_df.groupby("År")["Hårdvaruenheter (st)"].sum()
+hw_units_per_year = results_df.groupby("År")["Nyförsäljning hårdvaruenheter (st)"].sum()
 total_summary = total_by_year.copy()
 total_summary["Etablerad yta (m²)"] = total_summary["År"].map(lambda y: f"{int(etab_per_year.get(int(y), 0)):,}".replace(","," ") + " m²")
-total_summary["Hårdvaruenheter (st)"] = total_summary["År"].map(lambda y: f"{int(hw_units_per_year.get(int(y), 0)):,}".replace(","," ") + " st")
+total_summary["Nyförsäljning hårdvaruenheter (st)"] = total_summary["År"].map(lambda y: f"{int(hw_units_per_year.get(int(y), 0)):,}".replace(","," ") + " st")
 for col in ["Mjukvaruintäkt (kr)", "Hårdvaruintäkt (kr)", "Total intäkt (kr)"]:
     total_summary[col] = total_summary[col].map(lambda x: f"{int(x):,}".replace(",", " ") + " kr")
 
@@ -156,7 +156,7 @@ html_code = """
             <th>Hårdvaruintäkt (kr)</th>
             <th>Total intäkt (kr)</th>
             <th>Etablerad yta (m²)</th>
-            <th>Hårdvaruenheter (st)</th>
+            <th>Nyförsäljning hårdvaruenheter (st)</th>
         </tr>
     </thead>
     <tbody>
