@@ -74,7 +74,7 @@ for i, r in wide_growth.iterrows():
     for yr in year_cols:
         if int(yr) >= r["Startår"]:
             wide_growth.at[i, yr] = 30
-st.subheader("📈 Tillväxttakt per marknad och år")
+st.subheader("📈 Tillväxttakt per marknad och år (%)")
 wide_growth = st.data_editor(
     wide_growth, use_container_width=True,
     column_config={
